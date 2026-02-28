@@ -64,8 +64,18 @@
             toolStripSeparator2 = new ToolStripSeparator();
             CB_Directory = new ToolStripButton();
             CB_About = new ToolStripButton();
+            toolStripSeparator3 = new ToolStripSeparator();
+            CB_FontUp = new ToolStripButton();
+            CB_FontDown = new ToolStripButton();
+            CBox_FontSize = new ToolStripComboBox();
             splitContainer1 = new SplitContainer();
             TB_Edit = new RichTextBox();
+            statusStrip1 = new StatusStrip();
+            statusLineColumn = new ToolStripStatusLabel();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
+            statusFileInfo = new ToolStripStatusLabel();
+            toolStripStatusLabel2 = new ToolStripStatusLabel();
+            statusCapsLock = new ToolStripStatusLabel();
             TB_Console = new RichTextBox();
             menuStrip1.SuspendLayout();
             toolStrip1.SuspendLayout();
@@ -73,6 +83,7 @@
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
@@ -84,7 +95,6 @@
             menuStrip1.Size = new Size(884, 24);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
-            menuStrip1.ItemClicked += menuStrip1_ItemClicked;
             // 
             // TS_File
             // 
@@ -92,34 +102,33 @@
             TS_File.Name = "TS_File";
             TS_File.Size = new Size(48, 20);
             TS_File.Text = "Файл";
-            TS_File.Click += TS_File_Click;
             // 
             // TS_Open
             // 
             TS_Open.Name = "TS_Open";
             TS_Open.Size = new Size(154, 22);
-            TS_Open.Text = "Открыть";
+            TS_Open.Text = "Открыть Ctrl+O";
             TS_Open.Click += TS_Open_Click;
             // 
             // TS_Create
             // 
             TS_Create.Name = "TS_Create";
             TS_Create.Size = new Size(154, 22);
-            TS_Create.Text = "Создать";
+            TS_Create.Text = "Создать Ctrl+N";
             TS_Create.Click += TS_Create_Click;
             // 
             // TS_Save
             // 
             TS_Save.Name = "TS_Save";
             TS_Save.Size = new Size(154, 22);
-            TS_Save.Text = "Сохранить";
+            TS_Save.Text = "Сохранить Ctrl+S";
             TS_Save.Click += TS_Save_Click;
             // 
             // TS_SaveAs
             // 
             TS_SaveAs.Name = "TS_SaveAs";
             TS_SaveAs.Size = new Size(154, 22);
-            TS_SaveAs.Text = "Сохранить как";
+            TS_SaveAs.Text = "Сохранить как Ctrl+Shift+S";
             TS_SaveAs.Click += TS_SaveAs_Click;
             // 
             // TS_Exit
@@ -140,49 +149,49 @@
             // 
             TS_Undo.Name = "TS_Undo";
             TS_Undo.Size = new Size(148, 22);
-            TS_Undo.Text = "Отменить";
+            TS_Undo.Text = "Отменить Ctrl+Z";
             TS_Undo.Click += TS_Undo_Click;
             // 
             // TS_Redo
             // 
             TS_Redo.Name = "TS_Redo";
             TS_Redo.Size = new Size(148, 22);
-            TS_Redo.Text = "Повторить";
+            TS_Redo.Text = "Повторить Ctrl+Y";
             TS_Redo.Click += TS_Redo_Click;
             // 
             // TS_Cut
             // 
             TS_Cut.Name = "TS_Cut";
             TS_Cut.Size = new Size(148, 22);
-            TS_Cut.Text = "Вырезать";
+            TS_Cut.Text = "Вырезать Ctrl+X";
             TS_Cut.Click += TS_Cut_Click;
             // 
             // TS_Copy
             // 
             TS_Copy.Name = "TS_Copy";
             TS_Copy.Size = new Size(148, 22);
-            TS_Copy.Text = "Копировать";
+            TS_Copy.Text = "Копировать Ctrl+C";
             TS_Copy.Click += TS_Copy_Click;
             // 
             // TS_Paste
             // 
             TS_Paste.Name = "TS_Paste";
             TS_Paste.Size = new Size(148, 22);
-            TS_Paste.Text = "Вставить";
+            TS_Paste.Text = "Вставить Ctrl+V";
             TS_Paste.Click += TS_Paste_Click;
             // 
             // TS_Delete
             // 
             TS_Delete.Name = "TS_Delete";
             TS_Delete.Size = new Size(148, 22);
-            TS_Delete.Text = "Удалить";
+            TS_Delete.Text = "Удалить Delete";
             TS_Delete.Click += TS_Delete_Click;
             // 
             // TS_SelectAll
             // 
             TS_SelectAll.Name = "TS_SelectAll";
             TS_SelectAll.Size = new Size(148, 22);
-            TS_SelectAll.Text = "Выделить всё";
+            TS_SelectAll.Text = "Выделить всё Ctrl+A";
             TS_SelectAll.Click += TS_SelectAll_Click;
             // 
             // TS_Reference
@@ -191,13 +200,12 @@
             TS_Reference.Name = "TS_Reference";
             TS_Reference.Size = new Size(65, 20);
             TS_Reference.Text = "Справка";
-            TS_Reference.Click += TS_Reference_Click;
             // 
             // TS_Directory
             // 
             TS_Directory.Name = "TS_Directory";
             TS_Directory.Size = new Size(149, 22);
-            TS_Directory.Text = "Справочник";
+            TS_Directory.Text = "Справочник F1";
             TS_Directory.Click += TS_Directory_Click;
             // 
             // TS_About
@@ -210,7 +218,7 @@
             // toolStrip1
             // 
             toolStrip1.BackColor = SystemColors.MenuBar;
-            toolStrip1.Items.AddRange(new ToolStripItem[] { CB_Open, CB_Create, CB_Save, CB_SaveAs, CB_Exit, toolStripSeparator1, CB_Undo, CB_Redo, CB_Cut, CB_Copy, CB_Paste, CB_Delete, CB_SelectAll, toolStripSeparator2, CB_Directory, CB_About });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { CB_Open, CB_Create, CB_Save, CB_SaveAs, CB_Exit, toolStripSeparator1, CB_Undo, CB_Redo, CB_Cut, CB_Copy, CB_Paste, CB_Delete, CB_SelectAll, toolStripSeparator2, CB_Directory, CB_About, toolStripSeparator3, CB_FontUp, CB_FontDown, CBox_FontSize });
             toolStrip1.Location = new Point(0, 24);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(884, 25);
@@ -367,6 +375,38 @@
             CB_About.Text = "О программе";
             CB_About.Click += CB_About_Click;
             // 
+            // toolStripSeparator3
+            // 
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new Size(6, 25);
+            // 
+            // CB_FontUp
+            // 
+            CB_FontUp.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            CB_FontUp.Image = (Image)resources.GetObject("CB_FontUp.Image");
+            CB_FontUp.ImageTransparentColor = Color.Magenta;
+            CB_FontUp.Name = "CB_FontUp";
+            CB_FontUp.Size = new Size(23, 22);
+            CB_FontUp.Text = "Увеличить шрифт\nCtrl+Plus";
+            CB_FontUp.Click += CB_FontUp_Click;
+            // 
+            // CB_FontDown
+            // 
+            CB_FontDown.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            CB_FontDown.Image = (Image)resources.GetObject("CB_FontDown.Image");
+            CB_FontDown.ImageTransparentColor = Color.Magenta;
+            CB_FontDown.Name = "CB_FontDown";
+            CB_FontDown.Size = new Size(23, 22);
+            CB_FontDown.Text = "Уменьшить шрифт\nCtrl+Minus";
+            CB_FontDown.Click += CB_FontDown_Click;
+            // 
+            // CBox_FontSize
+            // 
+            CBox_FontSize.Items.AddRange(new object[] { "6", "7", "8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72" });
+            CBox_FontSize.Name = "CBox_FontSize";
+            CBox_FontSize.Size = new Size(75, 25);
+            CBox_FontSize.TextChanged += CBox_FontSize_SelectedIndexChanged;
+            // 
             // splitContainer1
             // 
             splitContainer1.Dock = DockStyle.Fill;
@@ -380,6 +420,7 @@
             // 
             // splitContainer1.Panel2
             // 
+            splitContainer1.Panel2.Controls.Add(statusStrip1);
             splitContainer1.Panel2.Controls.Add(TB_Console);
             splitContainer1.Size = new Size(884, 512);
             splitContainer1.SplitterDistance = 294;
@@ -392,8 +433,48 @@
             TB_Edit.Location = new Point(0, 0);
             TB_Edit.Name = "TB_Edit";
             TB_Edit.Size = new Size(884, 294);
-            TB_Edit.TabIndex = 0;
+            TB_Edit.TabIndex = 1;
             TB_Edit.Text = "";
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { statusLineColumn, toolStripStatusLabel1, statusFileInfo, toolStripStatusLabel2, statusCapsLock });
+            statusStrip1.Location = new Point(0, 192);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(884, 22);
+            statusStrip1.TabIndex = 1;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // statusLineColumn
+            // 
+            statusLineColumn.Name = "statusLineColumn";
+            statusLineColumn.Size = new Size(123, 17);
+            statusLineColumn.Text = "Строка: 1, Столбец: 1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(112, 17);
+            toolStripStatusLabel1.Text = "                                   ";
+            // 
+            // statusFileInfo
+            // 
+            statusFileInfo.Name = "statusFileInfo";
+            statusFileInfo.Size = new Size(129, 17);
+            statusFileInfo.Text = "Информация о файле";
+            // 
+            // toolStripStatusLabel2
+            // 
+            toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            toolStripStatusLabel2.Size = new Size(112, 17);
+            toolStripStatusLabel2.Text = "                                   ";
+            // 
+            // statusCapsLock
+            // 
+            statusCapsLock.Name = "statusCapsLock";
+            statusCapsLock.Size = new Size(36, 17);
+            statusCapsLock.Text = "CAPS";
+            statusCapsLock.TextAlign = ContentAlignment.MiddleRight;
             // 
             // TB_Console
             // 
@@ -423,8 +504,11 @@
             toolStrip1.PerformLayout();
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel2.ResumeLayout(false);
+            splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -465,9 +549,19 @@
         private ToolStripButton CB_Directory;
         private ToolStripButton CB_About;
         private SplitContainer splitContainer1;
-        private RichTextBox TB_Edit;
         private RichTextBox TB_Console;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripSeparator toolStripSeparator2;
+        private ToolStripSeparator toolStripSeparator3;
+        private ToolStripButton CB_FontUp;
+        private ToolStripButton CB_FontDown;
+        private ToolStripComboBox CBox_FontSize;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel statusLineColumn;
+        private ToolStripStatusLabel statusFileInfo;
+        private ToolStripStatusLabel statusCapsLock;
+        private ToolStripStatusLabel toolStripStatusLabel1;
+        private ToolStripStatusLabel toolStripStatusLabel2;
+        private RichTextBox TB_Edit;
     }
 }
