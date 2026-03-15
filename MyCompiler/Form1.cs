@@ -1,17 +1,22 @@
+п»їusing MyCompiler.LexicalAnalyzer;
+using System.Drawing.Text;
 using System.Windows.Forms;
 
 namespace MyCompiler
 {
-    public partial class Form1 : Form
+
+public partial class Form1 : Form
     {
 
         private string currentFile = string.Empty;
         private bool isTextChanged = false;
         private bool isUpdatingFontSize = false;
-
+        private Lexer _lexer;
         public Form1()
         {
+               
             InitializeComponent();
+            InitializeLexicalAnalyzer();
 
             if (TB_Edit.Font != null)
             {
@@ -22,7 +27,7 @@ namespace MyCompiler
 
             this.FormClosing += Form1_FormClosing;
 
-            this.Text = "Новый документ";
+            this.Text = "РќРѕРІС‹Р№ РґРѕРєСѓРјРµРЅС‚";
 
             TB_Edit.SelectionChanged += TB_Edit_SelectionChanged;
             TB_Edit.KeyUp += TB_Edit_KeyUp;
@@ -31,6 +36,15 @@ namespace MyCompiler
 
             this.KeyPreview = true;
             this.KeyDown += Form1_KeyDown;
+        }
+
+        private void InitializeLexicalAnalyzer()
+        {
+            _lexer = new Lexer();
+
+            SetupTokensGrid();
+
+            dgvTokens.CellClick += DgvTokens_CellClick;
         }
 
         public void TB_Edit_SelectionChanged(object sender, EventArgs e)
@@ -50,7 +64,7 @@ namespace MyCompiler
             int column = TB_Edit.SelectionStart -
                          TB_Edit.GetFirstCharIndexFromLine(line - 1) + 1;
 
-            statusLineColumn.Text = $"Строка: {line}, Столбец: {column}";
+            statusLineColumn.Text = $"РЎС‚СЂРѕРєР°: {line}, РЎС‚РѕР»Р±РµС†: {column}";
         }
 
         public void UpdateFileInfo()
@@ -73,7 +87,8 @@ namespace MyCompiler
             {
                 statusCapsLock.Text = "CAPSLOCK ON";
             }
-            else {
+            else
+            {
                 statusCapsLock.Text = "capslock off";
             }
             ;
@@ -82,7 +97,7 @@ namespace MyCompiler
         public void UpdateFileStatus()
         {
             UpdateFileInfo();
-            this.Text = $"{(string.IsNullOrEmpty(currentFile) ? "Новый документ" : Path.GetFileName(currentFile))}";
+            this.Text = $"{(string.IsNullOrEmpty(currentFile) ? "РќРѕРІС‹Р№ РґРѕРєСѓРјРµРЅС‚" : Path.GetFileName(currentFile))}";
         }
 
         public string FormatFileSize(long bytes)
@@ -103,8 +118,8 @@ namespace MyCompiler
             if (isTextChanged)
             {
                 DialogResult result = MessageBox.Show(
-                    "Сохранить изменения в файле?","Несохраненные изменения",
-                    MessageBoxButtons.YesNoCancel,MessageBoxIcon.Question);
+                    "РЎРѕС…СЂР°РЅРёС‚СЊ РёР·РјРµРЅРµРЅРёСЏ РІ С„Р°Р№Р»Рµ?", "РќРµСЃРѕС…СЂР°РЅРµРЅРЅС‹Рµ РёР·РјРµРЅРµРЅРёСЏ",
+                    MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
                 if (result == DialogResult.Yes)
                 {
@@ -157,8 +172,8 @@ namespace MyCompiler
             catch (Exception ex)
             {
                 isUpdatingFontSize = false;
-                MessageBox.Show($"Ошибка при изменении шрифта: {ex.Message}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"РћС€РёР±РєР° РїСЂРё РёР·РјРµРЅРµРЅРёРё С€СЂРёС„С‚Р°: {ex.Message}",
+                    "РћС€РёР±РєР°", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -178,8 +193,8 @@ namespace MyCompiler
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка при сохранении: {ex.Message}",
-                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"РћС€РёР±РєР° РїСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё: {ex.Message}",
+                        "РћС€РёР±РєР°", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -188,8 +203,8 @@ namespace MyCompiler
         {
             using (SaveFileDialog sfd = new SaveFileDialog())
             {
-                sfd.Filter = "Текстовые файлы (*.txt)|*.txt|Все файлы (*.*)|*.*";
-                sfd.Title = "Сохранить файл как";
+                sfd.Filter = "РўРµРєСЃС‚РѕРІС‹Рµ С„Р°Р№Р»С‹ (*.txt)|*.txt|Р’СЃРµ С„Р°Р№Р»С‹ (*.*)|*.*";
+                sfd.Title = "РЎРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р» РєР°Рє";
 
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
@@ -202,8 +217,8 @@ namespace MyCompiler
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Ошибка при сохранении: {ex.Message}",
-                            "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"РћС€РёР±РєР° РїСЂРё СЃРѕС…СЂР°РЅРµРЅРёРё: {ex.Message}",
+                            "РћС€РёР±РєР°", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -214,7 +229,7 @@ namespace MyCompiler
             if (isTextChanged)
             {
                 DialogResult result = MessageBox.Show(
-                    "Сохранить изменения в файле?", "Несохраненные изменения",
+                    "РЎРѕС…СЂР°РЅРёС‚СЊ РёР·РјРµРЅРµРЅРёСЏ РІ С„Р°Р№Р»Рµ?", "РќРµСЃРѕС…СЂР°РЅРµРЅРЅС‹Рµ РёР·РјРµРЅРµРЅРёСЏ",
                     MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
                 if (result == DialogResult.Yes)
@@ -241,8 +256,8 @@ namespace MyCompiler
 
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
-                ofd.Filter = "Текстовые файлы (*.txt)|*.txt|Все файлы (*.*)|*.*";
-                ofd.Title = "Открыть файл";
+                ofd.Filter = "РўРµРєСЃС‚РѕРІС‹Рµ С„Р°Р№Р»С‹ (*.txt)|*.txt|Р’СЃРµ С„Р°Р№Р»С‹ (*.*)|*.*";
+                ofd.Title = "РћС‚РєСЂС‹С‚СЊ С„Р°Р№Р»";
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
@@ -256,8 +271,8 @@ namespace MyCompiler
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Ошибка при открытии файла: {ex.Message}",
-                            "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"РћС€РёР±РєР° РїСЂРё РѕС‚РєСЂС‹С‚РёРё С„Р°Р№Р»Р°: {ex.Message}",
+                            "РћС€РёР±РєР°", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -270,7 +285,7 @@ namespace MyCompiler
                 TB_Edit.Clear();
                 currentFile = string.Empty;
                 isTextChanged = false;
-                this.Text = "Новый документ";
+                this.Text = "РќРѕРІС‹Р№ РґРѕРєСѓРјРµРЅС‚";
                 UpdateFileStatus();
             }
         }
@@ -352,16 +367,16 @@ namespace MyCompiler
         public void TS_Directory_Click(object sender, EventArgs e)
         {
             MessageBox.Show(
-               "Справочная система\n\n" +
-               "Реализованные функции:\n" +
-               "• Создание нового файла\n" +
-               "• Открытие существующего файла\n" +
-               "• Сохранение и сохранение как\n" +
-               "• Отмена/повтор действий\n" +
-               "• Вырезать/копировать/вставить/удалить\n" +
-               "• Выделение всего текста\n" +
-               "• Изменение размеров областей\n\n",
-               "Справка",
+               "РЎРїСЂР°РІРѕС‡РЅР°СЏ СЃРёСЃС‚РµРјР°\n\n" +
+               "Р РµР°Р»РёР·РѕРІР°РЅРЅС‹Рµ С„СѓРЅРєС†РёРё:\n" +
+               "вЂў РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°\n" +
+               "вЂў РћС‚РєСЂС‹С‚РёРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ С„Р°Р№Р»Р°\n" +
+               "вЂў РЎРѕС…СЂР°РЅРµРЅРёРµ Рё СЃРѕС…СЂР°РЅРµРЅРёРµ РєР°Рє\n" +
+               "вЂў РћС‚РјРµРЅР°/РїРѕРІС‚РѕСЂ РґРµР№СЃС‚РІРёР№\n" +
+               "вЂў Р’С‹СЂРµР·Р°С‚СЊ/РєРѕРїРёСЂРѕРІР°С‚СЊ/РІСЃС‚Р°РІРёС‚СЊ/СѓРґР°Р»РёС‚СЊ\n" +
+               "вЂў Р’С‹РґРµР»РµРЅРёРµ РІСЃРµРіРѕ С‚РµРєСЃС‚Р°\n" +
+               "вЂў РР·РјРµРЅРµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РѕР±Р»Р°СЃС‚РµР№\n\n",
+               "РЎРїСЂР°РІРєР°",
                MessageBoxButtons.OK,
                MessageBoxIcon.Information);
         }
@@ -370,10 +385,10 @@ namespace MyCompiler
         {
             MessageBox.Show(
                "MyCompiler\n" +
-               "Версия 0.0\n\n" +
-               "Текстовый редактор\n" +
-               "2026 г.",
-               "О программе",
+               "Р’РµСЂСЃРёСЏ 0.0\n\n" +
+               "РўРµРєСЃС‚РѕРІС‹Р№ СЂРµРґР°РєС‚РѕСЂ\n" +
+               "2026 Рі.",
+               "Рћ РїСЂРѕРіСЂР°РјРјРµ",
                MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -391,16 +406,17 @@ namespace MyCompiler
                         CBox_FontSize.Text = newSize.ToString();
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при изменении шрифта: {ex.Message}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"РћС€РёР±РєР° РїСЂРё РёР·РјРµРЅРµРЅРёРё С€СЂРёС„С‚Р°: {ex.Message}",
+                    "РћС€РёР±РєР°", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        public void Form1_KeyDown(object sender, KeyEventArgs e){
+        public void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
             if (e.Control)
             {
                 switch (e.KeyCode)
@@ -538,6 +554,219 @@ namespace MyCompiler
         public void CB_FontDown_Click(object sender, EventArgs e)
         {
             ChangeFontSize(-1);
+        }
+
+        private void CB_Start_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                TB_Edit.Text = Preparetext(TB_Edit.Text);
+                string inputText = TB_Edit.Text;
+
+                if (string.IsNullOrWhiteSpace(inputText))
+                {
+                    dgvTokens.Rows.Clear();
+                    return;
+                }
+
+                List<Token> tokens = _lexer.Analyze(inputText);
+
+                DisplayTokens(tokens);
+
+                if (_lexer.HasErrors)
+                {
+                    HighlightErrors(_lexer.Errors);
+                }
+            }
+            catch (Exception ex){}
+        }
+
+        private string Preparetext(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            while (input.Contains("    "))
+            {
+                input = input.Replace("    ", "\t");
+            }
+            while (input.Contains("  "))
+            {
+                input = input.Replace("  ", " ");
+            }
+
+            return input;
+        }
+
+        private string GetTokenTypeDescription(TokenType type)
+        {
+            return type switch
+            {
+                TokenType.KeywordWhile => "РљР»СЋС‡РµРІРѕРµ СЃР»РѕРІРѕ while",
+                TokenType.Identifier => "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ",
+                TokenType.DelimiterLParen => "Р Р°Р·РґРµР»РёС‚РµР»СЊ (",
+                TokenType.DelimiterRParen => "Р Р°Р·РґРµР»РёС‚РµР»СЊ )",
+                TokenType.DelimiterSemicolon => "Р Р°Р·РґРµР»РёС‚РµР»СЊ ;",
+                TokenType.DelimiterLBrace => "Р Р°Р·РґРµР»РёС‚РµР»СЊ {",
+                TokenType.DelimiterRBrace => "Р Р°Р·РґРµР»РёС‚РµР»СЊ }",
+                TokenType.IntegerNumber => "Р¦РµР»РѕРµ С‡РёСЃР»Рѕ",
+                TokenType.OperatorIncrement => "РћРїРµСЂР°С‚РѕСЂ РёРЅРєСЂРµРјРµРЅС‚Р° ++",
+                TokenType.OperatorPlus => "РћРїРµСЂР°С‚РѕСЂ СЃР»РѕР¶РµРЅРёСЏ +",
+                TokenType.OperatorDecrement => "РћРїРµСЂР°С‚РѕСЂ РґРµРєСЂРµРјРµРЅС‚Р° --",
+                TokenType.OperatorMinus => "РћРїРµСЂР°С‚РѕСЂ РІС‹С‡РёС‚Р°РЅРёСЏ -",
+                TokenType.OperatorLessEqual => "РћРїРµСЂР°С‚РѕСЂ <=",
+                TokenType.OperatorLess => "РћРїРµСЂР°С‚РѕСЂ <",
+                TokenType.OperatorGreaterEqual => "РћРїРµСЂР°С‚РѕСЂ >=",
+                TokenType.OperatorGreater => "РћРїРµСЂР°С‚РѕСЂ >",
+                TokenType.Error => "РћС€РёР±РєР°",
+                TokenType.OperatorSpace => "РџСЂРѕР±РµР»",
+                TokenType.OperatorTab => "РўР°Р±СѓР»СЏС†РёСЏ",
+                TokenType.OperatorNewLine => "РџРµСЂРµРІРѕРґ СЃС‚СЂРѕРєРё",
+                _ => type.ToString()
+            };
+        }
+
+        private void HighlightErrors(List<LexicalError> errors)
+        {
+            TB_Edit.SelectAll();
+            TB_Edit.SelectionBackColor = Color.White;
+            TB_Edit.SelectionColor = Color.Black;
+            TB_Edit.DeselectAll();
+
+            foreach (var error in errors)
+            {
+                try
+                {
+                    int lineStartIndex = TB_Edit.GetFirstCharIndexFromLine(error.Line - 1);
+                    if (lineStartIndex >= 0)
+                    {
+                        int errorIndex = lineStartIndex + error.Column - 1;
+
+                        if (errorIndex >= 0 && errorIndex < TB_Edit.TextLength)
+                        {
+                            TB_Edit.Select(errorIndex, 1);
+                            TB_Edit.SelectionBackColor = Color.LightCoral;
+                            TB_Edit.SelectionColor = Color.DarkRed;
+                        }
+                    }
+                }
+                catch (Exception ex){   }
+            }
+
+            TB_Edit.DeselectAll();
+        }
+
+        private void DgvTokens_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            DataGridViewRow row = dgvTokens.Rows[e.RowIndex];
+
+            string location = row.Cells["Location"].Value?.ToString();
+            if (string.IsNullOrEmpty(location)) return;
+
+            var parts = location.Split(':', '-');
+            if (parts.Length >= 3)
+            {
+                if (int.TryParse(parts[0], out int line) &&
+                    int.TryParse(parts[1], out int startCol) &&
+                    int.TryParse(parts[2], out int endCol))
+                {
+                    SetSelection(line, startCol, endCol);
+                }
+            }
+        }
+
+        private void SetSelection(int line, int startCol, int endCol)
+        {
+            try
+            {
+                int lineStartIndex = TB_Edit.GetFirstCharIndexFromLine(line - 1);
+                if (lineStartIndex >= 0)
+                {
+                    int startIndex = lineStartIndex + startCol - 1;
+                    int length = endCol - startCol + 1;
+
+                    if (startIndex >= 0 && startIndex + length <= TB_Edit.TextLength)
+                    {
+                        TB_Edit.Focus();
+                        TB_Edit.Select(startIndex, length);
+                        TB_Edit.ScrollToCaret();
+
+                        TB_Edit.SelectionBackColor = Color.LightBlue;
+                    }
+                }
+            }
+            catch (Exception ex) { }
+            
+        }
+
+        private void DisplayTokens(List<Token> tokens)
+        {
+            dgvTokens.Rows.Clear();
+
+            foreach (Token token in tokens)
+            {
+
+                int rowIndex = dgvTokens.Rows.Add();
+                DataGridViewRow row = dgvTokens.Rows[rowIndex];
+
+                row.Cells["Code"].Value = (int)token.Type;
+                row.Cells["Type"].Value = GetTokenTypeDescription(token.Type);
+
+                string displayValue = token.Value;
+                if (token.Type == TokenType.OperatorSpace)
+                    displayValue = "вђЈ";
+                else if (token.Type == TokenType.OperatorTab)
+                    displayValue = "в†’";
+                else if (token.Type == TokenType.OperatorNewLine)
+                    displayValue = "В¶";
+                row.Cells["Lexeme"].Value = displayValue;
+
+                row.Cells["Location"].Value = $"{token.Line}:{token.StartColumn}-{token.EndColumn}";
+
+                if (token.IsError)
+                {
+                    row.DefaultCellStyle.BackColor = Color.LightCoral;
+                    row.DefaultCellStyle.ForeColor = Color.DarkRed;
+                    row.Cells["Type"].Value = "РћС€РёР±РєР°";
+                }
+            }
+        }
+
+        private void SetupTokensGrid()
+        {
+            dgvTokens.AutoGenerateColumns = false;
+            dgvTokens.AllowUserToAddRows = false;
+            dgvTokens.ReadOnly = true;
+            dgvTokens.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvTokens.MultiSelect = false;
+
+            dgvTokens.Columns.Clear();
+
+            DataGridViewTextBoxColumn colCode = new DataGridViewTextBoxColumn();
+            colCode.Name = "Code";
+            colCode.HeaderText = "РљРѕРґ";
+            colCode.Width = 60;
+            dgvTokens.Columns.Add(colCode);
+
+            DataGridViewTextBoxColumn colType = new DataGridViewTextBoxColumn();
+            colType.Name = "Type";
+            colType.HeaderText = "РўРёРї";
+            colType.Width = 120;
+            dgvTokens.Columns.Add(colType);
+
+            DataGridViewTextBoxColumn colLexeme = new DataGridViewTextBoxColumn();
+            colLexeme.Name = "Lexeme";
+            colLexeme.HeaderText = "Р›РµРєСЃРµРјР°";
+            colLexeme.Width = 150;
+            dgvTokens.Columns.Add(colLexeme);
+
+            DataGridViewTextBoxColumn colLocation = new DataGridViewTextBoxColumn();
+            colLocation.Name = "Location";
+            colLocation.HeaderText = "РџРѕР·РёС†РёСЏ";
+            colLocation.Width = 100;
+            dgvTokens.Columns.Add(colLocation);
         }
     }
 }
