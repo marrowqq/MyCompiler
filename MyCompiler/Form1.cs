@@ -1,5 +1,6 @@
 ﻿using MyCompiler.LexicalAnalyzer;
 using System.Drawing.Text;
+using System.Text;
 using System.Windows.Forms;
 
 namespace MyCompiler
@@ -704,7 +705,9 @@ public partial class Form1 : Form
         private void DisplayTokens(List<Token> tokens)
         {
             dgvTokens.Rows.Clear();
-
+            StringBuilder textOutput = new StringBuilder();
+            textOutput.AppendLine("Код\tТип\tЛексема\tПозиция");
+            textOutput.AppendLine("---\t---\t-------\t--------");
             foreach (Token token in tokens)
             {
 
@@ -723,6 +726,7 @@ public partial class Form1 : Form
                     displayValue = "¶";
                 row.Cells["Lexeme"].Value = displayValue;
 
+                string location = $"{token.Line}:{token.StartColumn}-{token.EndColumn}";
                 row.Cells["Location"].Value = $"{token.Line}:{token.StartColumn}-{token.EndColumn}";
 
                 if (token.IsError)
@@ -731,9 +735,33 @@ public partial class Form1 : Form
                     row.DefaultCellStyle.ForeColor = Color.DarkRed;
                     row.Cells["Type"].Value = "Ошибка";
                 }
+                textOutput.AppendLine($"{(int)token.Type}\t{GetTokenTypeDescription(token.Type)}\t{displayValue}\t{location}");
+            }
+            //SaveTokensToFile(textOutput.ToString());
+        }
+        private void SaveTokensToFile(string content)
+        {
+            try
+            {
+                using (SaveFileDialog sfd = new SaveFileDialog())
+                {
+                    sfd.Filter = "Текстовые файлы (*.txt)|*.txt|Все файлы (*.*)|*.*";
+                    sfd.FileName = $"tokens_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                    sfd.Title = "Сохранить токены";
+
+                    if (sfd.ShowDialog() == DialogResult.OK)
+                    {
+                        File.WriteAllText(sfd.FileName, content, Encoding.UTF8);
+                        statusLineColumn.Text = $"Токены сохранены в {Path.GetFileName(sfd.FileName)}";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
         private void SetupTokensGrid()
         {
             dgvTokens.AutoGenerateColumns = false;
