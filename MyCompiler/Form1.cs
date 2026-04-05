@@ -2,7 +2,9 @@
 using System.Drawing.Text;
 using System.Text;
 using System.Windows.Forms;
-
+using MyCompiler.LexicalAnalyzer;
+using MyCompiler.SyntaxAnalyzer;
+    
 namespace MyCompiler
 {
 
@@ -44,8 +46,10 @@ public partial class Form1 : Form
             _lexer = new Lexer();
 
             SetupTokensGrid();
+            SetupSyntaxErrorsGrid();
 
             dgvTokens.CellClick += DgvTokens_CellClick;
+            dgvSyntaxErrors.CellClick += DgvSyntaxErrors_CellClick;
         }
 
         public void TB_Edit_SelectionChanged(object sender, EventArgs e)
@@ -567,19 +571,143 @@ public partial class Form1 : Form
                 if (string.IsNullOrWhiteSpace(inputText))
                 {
                     dgvTokens.Rows.Clear();
+                    dgvSyntaxErrors.Rows.Clear();
+                    rtbOutput.Clear();
+                    statusLineColumn.Text = "Введите код для анализа";
                     return;
                 }
 
                 List<Token> tokens = _lexer.Analyze(inputText);
-
                 DisplayTokens(tokens);
 
                 if (_lexer.HasErrors)
                 {
                     HighlightErrors(_lexer.Errors);
+                    statusLineColumn.Text = $"Лексических ошибок: {_lexer.Errors.Count}";
+                }
+                else
+                {
+                    statusLineColumn.Text = "Лексических ошибок не обнаружено";
+                }
+                var parser = new Parser(tokens);
+                List<SyntaxError> syntaxErrors = parser.Parse();
+
+                DisplaySyntaxErrors(syntaxErrors);
+                DisplayTextOutput(tokens, syntaxErrors);
+
+                if (syntaxErrors.Count > 0)
+                {
+                    HighlightSyntaxErrors(syntaxErrors);
+                }
+                if (syntaxErrors.Count == 0 && !_lexer.HasErrors)
+                {
+                    statusLineColumn.Text = "✓ Ошибок не обнаружено!";
+                }
+                else
+                {
+                    statusLineColumn.Text = $"Лексических: {_lexer.Errors?.Count ?? 0}, Синтаксических: {syntaxErrors.Count}";
                 }
             }
-            catch (Exception ex){}
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при анализе: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                statusLineColumn.Text = "Ошибка при выполнении анализа";
+            }
+        }
+
+        private void DisplaySyntaxErrors(List<SyntaxError> errors)
+        {
+            dgvSyntaxErrors.Rows.Clear();
+
+            if (errors == null || errors.Count == 0)
+            {
+                dgvSyntaxErrors.Rows.Add("", "✓ Синтаксических ошибок не обнаружено", "", "", "");
+                return;
+            }
+
+            foreach (var error in errors)
+            {
+                int rowIndex = dgvSyntaxErrors.Rows.Add();
+                DataGridViewRow row = dgvSyntaxErrors.Rows[rowIndex];
+
+                row.Cells["ErrorNumber"].Value = error.ErrorNumber;
+                row.Cells["ErrorMessage"].Value = error.Message;
+                row.Cells["Expected"].Value = error.Expected;
+                row.Cells["Found"].Value = error.Found;
+                row.Cells["ErrorPosition"].Value = $"{error.Line}:{error.Column}";
+
+                row.DefaultCellStyle.BackColor = Color.LightYellow;
+            }
+        }
+
+        private void HighlightSyntaxErrors(List<SyntaxError> errors)
+        {
+            foreach (var error in errors)
+            {
+                try
+                {
+                    int lineStartIndex = TB_Edit.GetFirstCharIndexFromLine(error.Line - 1);
+                    if (lineStartIndex >= 0)
+                    {
+                        int errorIndex = lineStartIndex + error.Column - 1;
+
+                        if (errorIndex >= 0 && errorIndex < TB_Edit.TextLength)
+                        {
+                            TB_Edit.Select(errorIndex, 1);
+                            if (TB_Edit.SelectionBackColor != Color.LightCoral)
+                            {
+                                TB_Edit.SelectionBackColor = Color.LightGoldenrodYellow;
+                                TB_Edit.SelectionColor = Color.DarkOrange;
+                            }
+                        }
+                    }
+                }
+                catch (Exception) { }
+            }
+
+            TB_Edit.DeselectAll();
+        }
+
+        private void DisplayTextOutput(List<Token> tokens, List<SyntaxError> syntaxErrors)
+        {
+            rtbOutput.Clear();
+
+            int lexicalErrors = 0;
+            foreach (var token in tokens)
+            {
+                if (token.IsError)
+                {
+                    lexicalErrors++;
+                }
+            }
+
+            int syntaxErrorsCount = syntaxErrors?.Count ?? 0;
+
+            rtbOutput.AppendText($"Лексических ошибок: {lexicalErrors}\n");
+            rtbOutput.AppendText($"Синтаксических ошибок: {syntaxErrorsCount}\n");
+        }
+
+        private void DgvSyntaxErrors_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            DataGridViewRow row = dgvSyntaxErrors.Rows[e.RowIndex];
+
+            if (row.Cells["ErrorPosition"].Value == null) return;
+
+            string position = row.Cells["ErrorPosition"].Value.ToString();
+            if (string.IsNullOrEmpty(position) || position == "0:0") return;
+
+            var parts = position.Split(':');
+            if (parts.Length == 2)
+            {
+                if (int.TryParse(parts[0], out int line) &&
+                    int.TryParse(parts[1], out int column))
+                {
+                    SetSelection(line, column, column);
+                }
+            }
         }
 
         private string Preparetext(string input)
@@ -619,6 +747,10 @@ public partial class Form1 : Form
                 TokenType.OperatorLess => "Оператор <",
                 TokenType.OperatorGreaterEqual => "Оператор >=",
                 TokenType.OperatorGreater => "Оператор >",
+                TokenType.OperatorEqual => "Оператор ==",
+                TokenType.OperatorNotEqual => "Оператор !=",
+                TokenType.OperatorLogicalOr => "Оператор ||",
+                TokenType.OperatorLogicalAnd => "Оператор &&",
                 TokenType.Error => "Ошибка",
                 TokenType.OperatorSpace => "Пробел",
                 TokenType.OperatorTab => "Табуляция",
@@ -708,9 +840,9 @@ public partial class Form1 : Form
             StringBuilder textOutput = new StringBuilder();
             textOutput.AppendLine("Код\tТип\tЛексема\tПозиция");
             textOutput.AppendLine("---\t---\t-------\t--------");
+
             foreach (Token token in tokens)
             {
-
                 int rowIndex = dgvTokens.Rows.Add();
                 DataGridViewRow row = dgvTokens.Rows[rowIndex];
 
@@ -724,10 +856,11 @@ public partial class Form1 : Form
                     displayValue = "→";
                 else if (token.Type == TokenType.OperatorNewLine)
                     displayValue = "¶";
+
                 row.Cells["Lexeme"].Value = displayValue;
 
                 string location = $"{token.Line}:{token.StartColumn}-{token.EndColumn}";
-                row.Cells["Location"].Value = $"{token.Line}:{token.StartColumn}-{token.EndColumn}";
+                row.Cells["Location"].Value = location;
 
                 if (token.IsError)
                 {
@@ -735,31 +868,8 @@ public partial class Form1 : Form
                     row.DefaultCellStyle.ForeColor = Color.DarkRed;
                     row.Cells["Type"].Value = "Ошибка";
                 }
-                textOutput.AppendLine($"{(int)token.Type}\t{GetTokenTypeDescription(token.Type)}\t{displayValue}\t{location}");
-            }
-            //SaveTokensToFile(textOutput.ToString());
-        }
-        private void SaveTokensToFile(string content)
-        {
-            try
-            {
-                using (SaveFileDialog sfd = new SaveFileDialog())
-                {
-                    sfd.Filter = "Текстовые файлы (*.txt)|*.txt|Все файлы (*.*)|*.*";
-                    sfd.FileName = $"tokens_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
-                    sfd.Title = "Сохранить токены";
 
-                    if (sfd.ShowDialog() == DialogResult.OK)
-                    {
-                        File.WriteAllText(sfd.FileName, content, Encoding.UTF8);
-                        statusLineColumn.Text = $"Токены сохранены в {Path.GetFileName(sfd.FileName)}";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textOutput.AppendLine($"{(int)token.Type}\t{GetTokenTypeDescription(token.Type)}\t{displayValue}\t{location}");
             }
         }
         private void SetupTokensGrid()
@@ -795,6 +905,47 @@ public partial class Form1 : Form
             colLocation.HeaderText = "Позиция";
             colLocation.Width = 100;
             dgvTokens.Columns.Add(colLocation);
+        }
+
+        private void SetupSyntaxErrorsGrid()
+        {
+            dgvSyntaxErrors.AutoGenerateColumns = false;
+            dgvSyntaxErrors.AllowUserToAddRows = false;
+            dgvSyntaxErrors.ReadOnly = true;
+            dgvSyntaxErrors.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvSyntaxErrors.MultiSelect = false;
+
+            dgvSyntaxErrors.Columns.Clear();
+
+            DataGridViewTextBoxColumn colNumber = new DataGridViewTextBoxColumn();
+            colNumber.Name = "ErrorNumber";
+            colNumber.HeaderText = "№";
+            colNumber.Width = 40;
+            dgvSyntaxErrors.Columns.Add(colNumber);
+
+            DataGridViewTextBoxColumn colMessage = new DataGridViewTextBoxColumn();
+            colMessage.Name = "ErrorMessage";
+            colMessage.HeaderText = "Сообщение об ошибке";
+            colMessage.Width = 300;
+            dgvSyntaxErrors.Columns.Add(colMessage);
+
+            DataGridViewTextBoxColumn colExpected = new DataGridViewTextBoxColumn();
+            colExpected.Name = "Expected";
+            colExpected.HeaderText = "Ожидалось";
+            colExpected.Width = 100;
+            dgvSyntaxErrors.Columns.Add(colExpected);
+
+            DataGridViewTextBoxColumn colFound = new DataGridViewTextBoxColumn();
+            colFound.Name = "Found";
+            colFound.HeaderText = "Найдено";
+            colFound.Width = 100;
+            dgvSyntaxErrors.Columns.Add(colFound);
+
+            DataGridViewTextBoxColumn colPosition = new DataGridViewTextBoxColumn();
+            colPosition.Name = "ErrorPosition";
+            colPosition.HeaderText = "Позиция";
+            colPosition.Width = 80;
+            dgvSyntaxErrors.Columns.Add(colPosition);
         }
     }
 }

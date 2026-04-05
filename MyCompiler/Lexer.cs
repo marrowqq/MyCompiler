@@ -34,7 +34,11 @@ namespace MyCompiler.LexicalAnalyzer
             InLessEqual = 16,
             InGreaterEqual = 17,
             InNewLine = 20,
-            InTab = 21
+            InTab = 21,
+            InEqual,
+            InNot,
+            InAmpersand,
+            InPipe
         }
 
         public Lexer()
@@ -200,6 +204,34 @@ namespace MyCompiler.LexicalAnalyzer
                             _position++;
                             _column++;
                         }
+                        else if (currentChar == '=')
+                        {
+                            state = State.InEqual;
+                            buffer.Append(currentChar);
+                            _position++;
+                            _column++;
+                        }
+                        else if (currentChar == '!')
+                        {
+                            state = State.InNot;
+                            buffer.Append(currentChar);
+                            _position++;
+                            _column++;
+                        }
+                        else if (currentChar == '&')
+                        {
+                            state = State.InAmpersand;
+                            buffer.Append(currentChar);
+                            _position++;
+                            _column++;
+                        }
+                        else if (currentChar == '|')
+                        {
+                            state = State.InPipe;
+                            buffer.Append(currentChar);
+                            _position++;
+                            _column++;
+                        }
                         else
                         {
                             return CreateErrorToken($"Недопустимый символ '{currentChar}'",
@@ -290,6 +322,62 @@ namespace MyCompiler.LexicalAnalyzer
                             return new Token(TokenType.OperatorGreater, ">",
                                 startLine, startColumn, _column - 1);
                         }
+
+                    case State.InEqual:
+                        if (currentChar == '=')
+                        {
+                            _position++;
+                            _column++;
+                            return new Token(TokenType.OperatorEqual, "==",
+                                startLine, startColumn, _column - 1);
+                        }
+                        else
+                        {
+                            return CreateErrorToken($"Ожидался '=', а не '{currentChar}' после '='",
+                                startLine, startColumn);
+                        }
+
+                    case State.InNot:
+                        if (currentChar == '=')
+                        {
+                            _position++;
+                            _column++;
+                            return new Token(TokenType.OperatorNotEqual, "!=",
+                                startLine, startColumn, _column - 1);
+                        }
+                        else
+                        {
+                            return CreateErrorToken($"Ожидался '=', а не '{currentChar}' после '!'",
+                                startLine, startColumn);
+                        }
+
+                    case State.InAmpersand:
+                        if (currentChar == '&')
+                        {
+                            _position++;
+                            _column++;
+                            return new Token(TokenType.OperatorLogicalAnd, "&&",
+                                startLine, startColumn, _column - 1);
+                        }
+                        else
+                        {
+                            return CreateErrorToken($"Ожидался '&', а не '{currentChar}' после '&'",
+                                startLine, startColumn);
+                        }
+
+                    case State.InPipe:
+                        if (currentChar == '|')
+                        {
+                            _position++;
+                            _column++;
+                            return new Token(TokenType.OperatorLogicalOr, "||",
+                                startLine, startColumn, _column - 1);
+                        }
+                        else
+                        {
+                            return CreateErrorToken($"Ожидался '|', а не '{currentChar}' после '|'",
+                                startLine, startColumn);
+                        }
                 }
             }
 
@@ -315,6 +403,18 @@ namespace MyCompiler.LexicalAnalyzer
                     case State.InGreater:
                         return new Token(TokenType.OperatorGreater, ">",
                             startLine, startColumn, _column - 1);
+                    case State.InEqual:
+                        return CreateErrorToken("Незавершенный оператор '='",
+                            startLine, startColumn);
+                    case State.InNot:
+                        return CreateErrorToken("Незавершенный оператор '!'",
+                            startLine, startColumn);
+                    case State.InAmpersand:
+                        return CreateErrorToken("Незавершенный оператор '&'",
+                            startLine, startColumn);
+                    case State.InPipe:
+                        return CreateErrorToken("Незавершенный оператор '|'",
+                            startLine, startColumn);
                 }
             }
 

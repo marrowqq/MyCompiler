@@ -29,6 +29,10 @@
         OperatorGreaterEqual = 18,
         OperatorGreater = 19,
         OperatorNewLine = 20,
-        OperatorTab = 21
+        OperatorTab = 21,
+        OperatorEqual = 22,
+        OperatorNotEqual = 23,
+        OperatorLogicalAnd = 24,
+        OperatorLogicalOr = 25
     }
 }

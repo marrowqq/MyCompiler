@@ -72,6 +72,7 @@
             CB_Start = new ToolStripButton();
             splitContainer1 = new SplitContainer();
             TB_Edit = new RichTextBox();
+            dgvTokens = new DataGridView();
             statusStrip1 = new StatusStrip();
             statusLineColumn = new ToolStripStatusLabel();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
@@ -79,15 +80,25 @@
             toolStripStatusLabel2 = new ToolStripStatusLabel();
             statusCapsLock = new ToolStripStatusLabel();
             TB_Console = new RichTextBox();
-            dgvTokens = new DataGridView();
+            OutPutTab = new TabControl();
+            tpTokens = new TabPage();
+            tpSyntaxErrors = new TabPage();
+            dgvSyntaxErrors = new DataGridView();
+            tpTextOutput = new TabPage();
+            rtbOutput = new RichTextBox();
             menuStrip1.SuspendLayout();
             toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
-            statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvTokens).BeginInit();
+            statusStrip1.SuspendLayout();
+            OutPutTab.SuspendLayout();
+            tpTokens.SuspendLayout();
+            tpSyntaxErrors.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvSyntaxErrors).BeginInit();
+            tpTextOutput.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
@@ -439,7 +450,7 @@
             // 
             // splitContainer1.Panel2
             // 
-            splitContainer1.Panel2.Controls.Add(dgvTokens);
+            splitContainer1.Panel2.Controls.Add(OutPutTab);
             splitContainer1.Panel2.Controls.Add(statusStrip1);
             splitContainer1.Panel2.Controls.Add(TB_Console);
             splitContainer1.Size = new Size(884, 512);
@@ -455,6 +466,14 @@
             TB_Edit.Size = new Size(884, 294);
             TB_Edit.TabIndex = 1;
             TB_Edit.Text = "";
+            // 
+            // dgvTokens
+            // 
+            dgvTokens.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvTokens.Location = new Point(0, 0);
+            dgvTokens.Name = "dgvTokens";
+            dgvTokens.Size = new Size(873, 158);
+            dgvTokens.TabIndex = 2;
             // 
             // statusStrip1
             // 
@@ -507,13 +526,66 @@
             TB_Console.TabIndex = 0;
             TB_Console.Text = "";
             // 
-            // dgvTokens
+            // OutPutTab
             // 
-            dgvTokens.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvTokens.Location = new Point(0, 0);
-            dgvTokens.Name = "dgvTokens";
-            dgvTokens.Size = new Size(878, 189);
-            dgvTokens.TabIndex = 2;
+            OutPutTab.Controls.Add(tpTokens);
+            OutPutTab.Controls.Add(tpSyntaxErrors);
+            OutPutTab.Controls.Add(tpTextOutput);
+            OutPutTab.Location = new Point(3, 3);
+            OutPutTab.Name = "OutPutTab";
+            OutPutTab.SelectedIndex = 0;
+            OutPutTab.Size = new Size(881, 186);
+            OutPutTab.TabIndex = 2;
+            // 
+            // tpTokens
+            // 
+            tpTokens.Controls.Add(dgvTokens);
+            tpTokens.Location = new Point(4, 24);
+            tpTokens.Name = "tpTokens";
+            tpTokens.Padding = new Padding(3);
+            tpTokens.Size = new Size(873, 158);
+            tpTokens.TabIndex = 0;
+            tpTokens.Text = "Токены";
+            tpTokens.UseVisualStyleBackColor = true;
+            // 
+            // tpSyntaxErrors
+            // 
+            tpSyntaxErrors.BackColor = Color.Tomato;
+            tpSyntaxErrors.Controls.Add(dgvSyntaxErrors);
+            tpSyntaxErrors.Location = new Point(4, 24);
+            tpSyntaxErrors.Name = "tpSyntaxErrors";
+            tpSyntaxErrors.Padding = new Padding(3);
+            tpSyntaxErrors.Size = new Size(873, 158);
+            tpSyntaxErrors.TabIndex = 1;
+            tpSyntaxErrors.Text = "Синтаксические ошибки";
+            // 
+            // dgvSyntaxErrors
+            // 
+            dgvSyntaxErrors.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvSyntaxErrors.Location = new Point(-4, 0);
+            dgvSyntaxErrors.Name = "dgvSyntaxErrors";
+            dgvSyntaxErrors.Size = new Size(877, 158);
+            dgvSyntaxErrors.TabIndex = 3;
+            // 
+            // tpTextOutput
+            // 
+            tpTextOutput.Controls.Add(rtbOutput);
+            tpTextOutput.Location = new Point(4, 24);
+            tpTextOutput.Name = "tpTextOutput";
+            tpTextOutput.Padding = new Padding(3);
+            tpTextOutput.Size = new Size(873, 158);
+            tpTextOutput.TabIndex = 2;
+            tpTextOutput.Text = "Текстовый вывод";
+            tpTextOutput.UseVisualStyleBackColor = true;
+            // 
+            // rtbOutput
+            // 
+            rtbOutput.Font = new Font("Consolas", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            rtbOutput.Location = new Point(0, 0);
+            rtbOutput.Name = "rtbOutput";
+            rtbOutput.Size = new Size(874, 158);
+            rtbOutput.TabIndex = 0;
+            rtbOutput.Text = "";
             // 
             // Form1
             // 
@@ -535,9 +607,14 @@
             splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvTokens).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvTokens).EndInit();
+            OutPutTab.ResumeLayout(false);
+            tpTokens.ResumeLayout(false);
+            tpSyntaxErrors.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvSyntaxErrors).EndInit();
+            tpTextOutput.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -595,5 +672,11 @@
         private ToolStripSeparator toolStripSeparator4;
         private ToolStripButton CB_Start;
         private DataGridView dgvTokens;
+        private TabControl OutPutTab;
+        private TabPage tpTokens;
+        private TabPage tpSyntaxErrors;
+        private DataGridView dgvSyntaxErrors;
+        private TabPage tpTextOutput;
+        private RichTextBox rtbOutput;
     }
 }
