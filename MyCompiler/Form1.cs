@@ -1,10 +1,10 @@
 ﻿using MyCompiler.LexicalAnalyzer;
+using MyCompiler.SyntaxAnalyzer;
+using MyCompiler.SearchModule;
 using System.Drawing.Text;
 using System.Text;
 using System.Windows.Forms;
-using MyCompiler.LexicalAnalyzer;
-using MyCompiler.SyntaxAnalyzer;
-    
+
 namespace MyCompiler
 {
 
@@ -47,9 +47,11 @@ public partial class Form1 : Form
 
             SetupTokensGrid();
             SetupSyntaxErrorsGrid();
+            SetupSearchResultsGrid();
 
             dgvTokens.CellClick += DgvTokens_CellClick;
             dgvSyntaxErrors.CellClick += DgvSyntaxErrors_CellClick;
+            dgvSearchResults.CellClick += DgvSearchResults_CellClick;
         }
 
         public void TB_Edit_SelectionChanged(object sender, EventArgs e)
@@ -946,6 +948,121 @@ public partial class Form1 : Form
             colPosition.HeaderText = "Позиция";
             colPosition.Width = 80;
             dgvSyntaxErrors.Columns.Add(colPosition);
+        }
+
+        private void SetupSearchResultsGrid()
+        {
+            dgvSearchResults.AutoGenerateColumns = false;
+            dgvSearchResults.AllowUserToAddRows = false;
+            dgvSearchResults.ReadOnly = true;
+            dgvSearchResults.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvSearchResults.MultiSelect = false;
+
+            dgvSearchResults.Columns.Clear();
+
+            DataGridViewTextBoxColumn colMatch = new DataGridViewTextBoxColumn();
+            colMatch.Name = "Match";
+            colMatch.HeaderText = "Найденная подстрока";
+            colMatch.Width = 300;
+            dgvSearchResults.Columns.Add(colMatch);
+
+            DataGridViewTextBoxColumn colPosition = new DataGridViewTextBoxColumn();
+            colPosition.Name = "Position";
+            colPosition.HeaderText = "Позиция (строка:символ)";
+            colPosition.Width = 120;
+            dgvSearchResults.Columns.Add(colPosition);
+
+            DataGridViewTextBoxColumn colLength = new DataGridViewTextBoxColumn();
+            colLength.Name = "Length";
+            colLength.HeaderText = "Длина";
+            colLength.Width = 60;
+            dgvSearchResults.Columns.Add(colLength);
+        }
+
+        private void CB_Search_Click(object sender, EventArgs e)
+        {
+            string text = TB_Edit.Text;
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                MessageBox.Show("Введите текст для поиска", "Предупреждение",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            RegexSearcher.SearchType searchType;
+            switch (cbSearchType.SelectedIndex)
+            {
+                case 0:
+                    searchType = RegexSearcher.SearchType.Years2000to2010;
+                    break;
+                case 1:
+                    searchType = RegexSearcher.SearchType.MirCard;
+                    break;
+                case 2:
+                    searchType = RegexSearcher.SearchType.IPv6WithPrefix;
+                    break;
+                default:
+                    searchType = RegexSearcher.SearchType.Years2000to2010;
+                    break;
+            }
+
+            RegexSearcher searcher = new RegexSearcher();
+            List<SearchResult> results = searcher.FindMatches(text, searchType);
+
+            DisplaySearchResults(results);
+
+            lblSearchCount.Text = $"Найдено: {results.Count}";
+
+            ClearSearchHighlight();
+        }
+
+        private void DisplaySearchResults(List<SearchResult> results)
+        {
+            dgvSearchResults.Rows.Clear();
+
+            foreach (var result in results)
+            {
+                int rowIndex = dgvSearchResults.Rows.Add();
+                DataGridViewRow row = dgvSearchResults.Rows[rowIndex];
+
+                row.Cells["Match"].Value = result.Match;
+                row.Cells["Position"].Value = $"{result.Line}:{result.Position}";
+                row.Cells["Length"].Value = result.Length;
+
+                row.Tag = result.AbsoluteIndex;
+            }
+        }
+     
+        private void DgvSearchResults_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            DataGridViewRow row = dgvSearchResults.Rows[e.RowIndex];
+            int absoluteIndex = (int)row.Tag;
+            int length = Convert.ToInt32(row.Cells["Length"].Value);
+
+            ClearSearchHighlight();
+
+            if (absoluteIndex >= 0 && absoluteIndex + length <= TB_Edit.TextLength)
+            {
+                TB_Edit.Focus();
+                TB_Edit.Select(absoluteIndex, length);
+                TB_Edit.SelectionBackColor = Color.Yellow;
+                TB_Edit.ScrollToCaret();
+            }
+        }
+
+        private void ClearSearchHighlight()
+        {
+            int selectionStart = TB_Edit.SelectionStart;
+            int selectionLength = TB_Edit.SelectionLength;
+
+            TB_Edit.SelectAll();
+            TB_Edit.SelectionBackColor = Color.White;
+            TB_Edit.SelectionColor = Color.Black;
+
+            TB_Edit.Select(selectionStart, selectionLength);
         }
     }
 }

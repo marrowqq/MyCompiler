@@ -70,35 +70,44 @@
             CBox_FontSize = new ToolStripComboBox();
             toolStripSeparator4 = new ToolStripSeparator();
             CB_Start = new ToolStripButton();
+            toolStripButton1 = new ToolStripSeparator();
+            cbSearchType = new ToolStripComboBox();
+            CB_Search = new ToolStripButton();
             splitContainer1 = new SplitContainer();
             TB_Edit = new RichTextBox();
+            OutPutTab = new TabControl();
+            tpTokens = new TabPage();
             dgvTokens = new DataGridView();
+            tpSyntaxErrors = new TabPage();
+            dgvSyntaxErrors = new DataGridView();
+            tpTextOutput = new TabPage();
+            rtbOutput = new RichTextBox();
+            tabPage1 = new TabPage();
+            dgvSearchResults = new DataGridView();
             statusStrip1 = new StatusStrip();
             statusLineColumn = new ToolStripStatusLabel();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             statusFileInfo = new ToolStripStatusLabel();
             toolStripStatusLabel2 = new ToolStripStatusLabel();
             statusCapsLock = new ToolStripStatusLabel();
+            toolStripStatusLabel3 = new ToolStripStatusLabel();
+            lblSearchCount = new ToolStripStatusLabel();
             TB_Console = new RichTextBox();
-            OutPutTab = new TabControl();
-            tpTokens = new TabPage();
-            tpSyntaxErrors = new TabPage();
-            dgvSyntaxErrors = new DataGridView();
-            tpTextOutput = new TabPage();
-            rtbOutput = new RichTextBox();
             menuStrip1.SuspendLayout();
             toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
             splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)dgvTokens).BeginInit();
-            statusStrip1.SuspendLayout();
             OutPutTab.SuspendLayout();
             tpTokens.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvTokens).BeginInit();
             tpSyntaxErrors.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvSyntaxErrors).BeginInit();
             tpTextOutput.SuspendLayout();
+            tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvSearchResults).BeginInit();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
@@ -233,7 +242,7 @@
             // toolStrip1
             // 
             toolStrip1.BackColor = SystemColors.MenuBar;
-            toolStrip1.Items.AddRange(new ToolStripItem[] { CB_Open, CB_Create, CB_Save, CB_SaveAs, CB_Exit, toolStripSeparator1, CB_Undo, CB_Redo, CB_Cut, CB_Copy, CB_Paste, CB_Delete, CB_SelectAll, toolStripSeparator2, CB_Directory, CB_About, toolStripSeparator3, CB_FontUp, CB_FontDown, CBox_FontSize, toolStripSeparator4, CB_Start });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { CB_Open, CB_Create, CB_Save, CB_SaveAs, CB_Exit, toolStripSeparator1, CB_Undo, CB_Redo, CB_Cut, CB_Copy, CB_Paste, CB_Delete, CB_SelectAll, toolStripSeparator2, CB_Directory, CB_About, toolStripSeparator3, CB_FontUp, CB_FontDown, CBox_FontSize, toolStripSeparator4, CB_Start, toolStripButton1, cbSearchType, CB_Search });
             toolStrip1.Location = new Point(0, 24);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(884, 25);
@@ -437,6 +446,27 @@
             CB_Start.Text = "Старт";
             CB_Start.Click += CB_Start_Click;
             // 
+            // toolStripButton1
+            // 
+            toolStripButton1.Name = "toolStripButton1";
+            toolStripButton1.Size = new Size(6, 25);
+            // 
+            // cbSearchType
+            // 
+            cbSearchType.Items.AddRange(new object[] { "Годы между 2000 и 2010", "Номера карт МИР", "IPv6 адреса с префиксом" });
+            cbSearchType.Name = "cbSearchType";
+            cbSearchType.Size = new Size(121, 25);
+            // 
+            // CB_Search
+            // 
+            CB_Search.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            CB_Search.Image = (Image)resources.GetObject("CB_Search.Image");
+            CB_Search.ImageTransparentColor = Color.Magenta;
+            CB_Search.Name = "CB_Search";
+            CB_Search.Size = new Size(23, 22);
+            CB_Search.Text = "Поиск РВ";
+            CB_Search.Click += CB_Search_Click;
+            // 
             // splitContainer1
             // 
             splitContainer1.Dock = DockStyle.Fill;
@@ -467,70 +497,12 @@
             TB_Edit.TabIndex = 1;
             TB_Edit.Text = "";
             // 
-            // dgvTokens
-            // 
-            dgvTokens.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvTokens.Location = new Point(0, 0);
-            dgvTokens.Name = "dgvTokens";
-            dgvTokens.Size = new Size(873, 158);
-            dgvTokens.TabIndex = 2;
-            // 
-            // statusStrip1
-            // 
-            statusStrip1.Items.AddRange(new ToolStripItem[] { statusLineColumn, toolStripStatusLabel1, statusFileInfo, toolStripStatusLabel2, statusCapsLock });
-            statusStrip1.Location = new Point(0, 192);
-            statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(884, 22);
-            statusStrip1.TabIndex = 1;
-            statusStrip1.Text = "statusStrip1";
-            // 
-            // statusLineColumn
-            // 
-            statusLineColumn.Name = "statusLineColumn";
-            statusLineColumn.Size = new Size(123, 17);
-            statusLineColumn.Text = "Строка: 1, Столбец: 1";
-            // 
-            // toolStripStatusLabel1
-            // 
-            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            toolStripStatusLabel1.Size = new Size(112, 17);
-            toolStripStatusLabel1.Text = "                                   ";
-            // 
-            // statusFileInfo
-            // 
-            statusFileInfo.Name = "statusFileInfo";
-            statusFileInfo.Size = new Size(129, 17);
-            statusFileInfo.Text = "Информация о файле";
-            // 
-            // toolStripStatusLabel2
-            // 
-            toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-            toolStripStatusLabel2.Size = new Size(112, 17);
-            toolStripStatusLabel2.Text = "                                   ";
-            // 
-            // statusCapsLock
-            // 
-            statusCapsLock.Name = "statusCapsLock";
-            statusCapsLock.Size = new Size(36, 17);
-            statusCapsLock.Text = "CAPS";
-            statusCapsLock.TextAlign = ContentAlignment.MiddleRight;
-            // 
-            // TB_Console
-            // 
-            TB_Console.AcceptsTab = true;
-            TB_Console.Dock = DockStyle.Fill;
-            TB_Console.Location = new Point(0, 0);
-            TB_Console.Name = "TB_Console";
-            TB_Console.ReadOnly = true;
-            TB_Console.Size = new Size(884, 214);
-            TB_Console.TabIndex = 0;
-            TB_Console.Text = "";
-            // 
             // OutPutTab
             // 
             OutPutTab.Controls.Add(tpTokens);
             OutPutTab.Controls.Add(tpSyntaxErrors);
             OutPutTab.Controls.Add(tpTextOutput);
+            OutPutTab.Controls.Add(tabPage1);
             OutPutTab.Location = new Point(3, 3);
             OutPutTab.Name = "OutPutTab";
             OutPutTab.SelectedIndex = 0;
@@ -547,6 +519,14 @@
             tpTokens.TabIndex = 0;
             tpTokens.Text = "Токены";
             tpTokens.UseVisualStyleBackColor = true;
+            // 
+            // dgvTokens
+            // 
+            dgvTokens.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvTokens.Location = new Point(0, 0);
+            dgvTokens.Name = "dgvTokens";
+            dgvTokens.Size = new Size(873, 158);
+            dgvTokens.TabIndex = 2;
             // 
             // tpSyntaxErrors
             // 
@@ -587,6 +567,88 @@
             rtbOutput.TabIndex = 0;
             rtbOutput.Text = "";
             // 
+            // tabPage1
+            // 
+            tabPage1.Controls.Add(dgvSearchResults);
+            tabPage1.Location = new Point(4, 24);
+            tabPage1.Name = "tabPage1";
+            tabPage1.Padding = new Padding(3);
+            tabPage1.Size = new Size(873, 158);
+            tabPage1.TabIndex = 3;
+            tabPage1.Text = "Поиск по коду";
+            tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // dgvSearchResults
+            // 
+            dgvSearchResults.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvSearchResults.Location = new Point(0, 0);
+            dgvSearchResults.Name = "dgvSearchResults";
+            dgvSearchResults.Size = new Size(873, 158);
+            dgvSearchResults.TabIndex = 0;
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { statusLineColumn, toolStripStatusLabel1, statusFileInfo, toolStripStatusLabel2, statusCapsLock, toolStripStatusLabel3, lblSearchCount });
+            statusStrip1.Location = new Point(0, 192);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(884, 22);
+            statusStrip1.TabIndex = 1;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // statusLineColumn
+            // 
+            statusLineColumn.Name = "statusLineColumn";
+            statusLineColumn.Size = new Size(123, 17);
+            statusLineColumn.Text = "Строка: 1, Столбец: 1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(112, 17);
+            toolStripStatusLabel1.Text = "                                   ";
+            // 
+            // statusFileInfo
+            // 
+            statusFileInfo.Name = "statusFileInfo";
+            statusFileInfo.Size = new Size(129, 17);
+            statusFileInfo.Text = "Информация о файле";
+            // 
+            // toolStripStatusLabel2
+            // 
+            toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            toolStripStatusLabel2.Size = new Size(112, 17);
+            toolStripStatusLabel2.Text = "                                   ";
+            // 
+            // statusCapsLock
+            // 
+            statusCapsLock.Name = "statusCapsLock";
+            statusCapsLock.Size = new Size(36, 17);
+            statusCapsLock.Text = "CAPS";
+            statusCapsLock.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // toolStripStatusLabel3
+            // 
+            toolStripStatusLabel3.Name = "toolStripStatusLabel3";
+            toolStripStatusLabel3.Size = new Size(88, 17);
+            toolStripStatusLabel3.Text = "          Найдено:";
+            // 
+            // lblSearchCount
+            // 
+            lblSearchCount.Name = "lblSearchCount";
+            lblSearchCount.Size = new Size(10, 17);
+            lblSearchCount.Text = " ";
+            // 
+            // TB_Console
+            // 
+            TB_Console.AcceptsTab = true;
+            TB_Console.Dock = DockStyle.Fill;
+            TB_Console.Location = new Point(0, 0);
+            TB_Console.Name = "TB_Console";
+            TB_Console.ReadOnly = true;
+            TB_Console.Size = new Size(884, 214);
+            TB_Console.TabIndex = 0;
+            TB_Console.Text = "";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -607,14 +669,16 @@
             splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)dgvTokens).EndInit();
-            statusStrip1.ResumeLayout(false);
-            statusStrip1.PerformLayout();
             OutPutTab.ResumeLayout(false);
             tpTokens.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvTokens).EndInit();
             tpSyntaxErrors.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvSyntaxErrors).EndInit();
             tpTextOutput.ResumeLayout(false);
+            tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)dgvSearchResults).EndInit();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -678,5 +742,12 @@
         private DataGridView dgvSyntaxErrors;
         private TabPage tpTextOutput;
         private RichTextBox rtbOutput;
+        private ToolStripSeparator toolStripButton1;
+        private ToolStripComboBox cbSearchType;
+        private ToolStripButton CB_Search;
+        private TabPage tabPage1;
+        private DataGridView dgvSearchResults;
+        private ToolStripStatusLabel toolStripStatusLabel3;
+        private ToolStripStatusLabel lblSearchCount;
     }
 }
