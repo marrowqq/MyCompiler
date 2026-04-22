@@ -234,8 +234,12 @@ namespace MyCompiler.LexicalAnalyzer
                         }
                         else
                         {
-                            return CreateErrorToken($"Недопустимый символ '{currentChar}'",
+                            // Недопустимый символ: создаем ошибку, сдвигаем позицию на 1 и возвращаем
+                            Token err = CreateErrorToken($"Недопустимый символ '{currentChar}'",
                                 startLine, startColumn);
+                            _position++;
+                            _column++;
+                            return err;
                         }
                         break;
 
@@ -324,6 +328,7 @@ namespace MyCompiler.LexicalAnalyzer
                         }
 
                     case State.InEqual:
+                        // Уже считали '=', проверяем, не '==' ли
                         if (currentChar == '=')
                         {
                             _position++;
@@ -333,8 +338,11 @@ namespace MyCompiler.LexicalAnalyzer
                         }
                         else
                         {
-                            return CreateErrorToken($"Ожидался '=', а не '{currentChar}' после '='",
+                            // Одиночный '=' - ошибка, но символ '=' уже съеден, возвращаем ошибку
+                            // Позицию не сдвигаем, т.к. мы уже её сдвинули при чтении '='
+                            Token err = CreateErrorToken($"Одиночный '=' недопустим, ожидалось '=='",
                                 startLine, startColumn);
+                            return err;
                         }
 
                     case State.InNot:
@@ -347,8 +355,9 @@ namespace MyCompiler.LexicalAnalyzer
                         }
                         else
                         {
-                            return CreateErrorToken($"Ожидался '=', а не '{currentChar}' после '!'",
+                            Token err = CreateErrorToken($"Одиночный '!' недопустим, ожидалось '!='",
                                 startLine, startColumn);
+                            return err;
                         }
 
                     case State.InAmpersand:
@@ -361,8 +370,9 @@ namespace MyCompiler.LexicalAnalyzer
                         }
                         else
                         {
-                            return CreateErrorToken($"Ожидался '&', а не '{currentChar}' после '&'",
+                            Token err = CreateErrorToken($"Одиночный '&' недопустим, ожидалось '&&'",
                                 startLine, startColumn);
+                            return err;
                         }
 
                     case State.InPipe:
@@ -375,12 +385,14 @@ namespace MyCompiler.LexicalAnalyzer
                         }
                         else
                         {
-                            return CreateErrorToken($"Ожидался '|', а не '{currentChar}' после '|'",
+                            Token err = CreateErrorToken($"Одиночный '|' недопустим, ожидалось '||'",
                                 startLine, startColumn);
+                            return err;
                         }
                 }
             }
 
+            // Конец файла
             if (buffer.Length > 0)
             {
                 switch (state)
@@ -404,17 +416,13 @@ namespace MyCompiler.LexicalAnalyzer
                         return new Token(TokenType.OperatorGreater, ">",
                             startLine, startColumn, _column - 1);
                     case State.InEqual:
-                        return CreateErrorToken("Незавершенный оператор '='",
-                            startLine, startColumn);
+                        return CreateErrorToken($"Незавершенный оператор '='", startLine, startColumn);
                     case State.InNot:
-                        return CreateErrorToken("Незавершенный оператор '!'",
-                            startLine, startColumn);
+                        return CreateErrorToken($"Незавершенный оператор '!'", startLine, startColumn);
                     case State.InAmpersand:
-                        return CreateErrorToken("Незавершенный оператор '&'",
-                            startLine, startColumn);
+                        return CreateErrorToken($"Незавершенный оператор '&'", startLine, startColumn);
                     case State.InPipe:
-                        return CreateErrorToken("Незавершенный оператор '|'",
-                            startLine, startColumn);
+                        return CreateErrorToken($"Незавершенный оператор '|'", startLine, startColumn);
                 }
             }
 

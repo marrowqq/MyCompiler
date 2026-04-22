@@ -1,5 +1,4 @@
-﻿// RegexSearcher.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -8,12 +7,12 @@ namespace MyCompiler.SearchModule
     public class RegexSearcher
     {
 
-        private const string PatternYears = @"\b(200[0-9]|2010)\b";
+        private const string PatternYears = @"(200[0-9]|2010)";
 
-        private const string PatternMirCard = @"\b220[0-4]\d{12}\b";
+        private const string PatternMirCard = @"220[0-4]\d{12}";
 
         private const string PatternIPv6WithPrefix =
-            @"\b([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}/\d{1,3}\b";
+            @"([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}/\d{1,3}";
 
         public enum SearchType
         {
@@ -91,7 +90,6 @@ namespace MyCompiler.SearchModule
             }
             return lineNumber;
         }
-
         private int GetPositionInLine(string text, int index)
         {
             int position = 1;
