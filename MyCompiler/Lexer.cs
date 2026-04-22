@@ -234,7 +234,6 @@ namespace MyCompiler.LexicalAnalyzer
                         }
                         else
                         {
-                            // Недопустимый символ: создаем ошибку, сдвигаем позицию на 1 и возвращаем
                             Token err = CreateErrorToken($"Недопустимый символ '{currentChar}'",
                                 startLine, startColumn);
                             _position++;
@@ -328,7 +327,6 @@ namespace MyCompiler.LexicalAnalyzer
                         }
 
                     case State.InEqual:
-                        // Уже считали '=', проверяем, не '==' ли
                         if (currentChar == '=')
                         {
                             _position++;
@@ -338,8 +336,6 @@ namespace MyCompiler.LexicalAnalyzer
                         }
                         else
                         {
-                            // Одиночный '=' - ошибка, но символ '=' уже съеден, возвращаем ошибку
-                            // Позицию не сдвигаем, т.к. мы уже её сдвинули при чтении '='
                             Token err = CreateErrorToken($"Одиночный '=' недопустим, ожидалось '=='",
                                 startLine, startColumn);
                             return err;
@@ -392,7 +388,6 @@ namespace MyCompiler.LexicalAnalyzer
                 }
             }
 
-            // Конец файла
             if (buffer.Length > 0)
             {
                 switch (state)
