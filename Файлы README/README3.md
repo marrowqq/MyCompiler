@@ -47,11 +47,11 @@ while (i ? 10) {
 
 **Разработка грамматики:**
 ```
-<start>→ while ( <condition> ) {<statement_block>} ;
-<condition> → <LOGSTMNT> | <condition> <logical_operator> <condition>
+<start>→ "while" "(" <condition> ")" {<statement_block>} ;
+<condition> → <logstmnt> | <condition> <logical_operator> <condition>
 <logical_operator> → "&&" | "||"
-<LOGSTMNT> → <variable>|<number> <comparison_operator> <variable>| <number>
-<comparison_operator> → < | > | <= | >= | == | !=
+<logstmnt> → <variable>|<number> <comparison_operator> <variable>| <number>
+<comparison_operator> → "<" | ">" | "<=" | ">=" | "==" | "!="
 <number> → <digit>
 <digit> → "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 <statement_block> → "{" <statement_list> "}"
@@ -59,6 +59,10 @@ while (i ? 10) {
 <statement> → <increment_statement> ;
 <increment_statement> → <variable> "++" | <variable> "--";
 ```
+Словарь терминальных символов :
+T = {while, (, ), {, }, ;, &&, ||, <, >, <=, >=, ==, !=, ++, --, <variable>, <number>}
+Словарь нетерминальных символов :
+N = {<start>, <condition>, <logical_operator>, <LOGSTMNT>, <comparison_operator>, <number>, <digit>, <statement_block>, <statement_list>, <statement>, <increment_statement>}
 
 **Классификация грамматики (по Хомскому):**
 Данная грамматика относится к контекстно-свободному типу (КС-грамматика, тип 2) по классификации Хомского.
