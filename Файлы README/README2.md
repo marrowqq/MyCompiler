@@ -31,6 +31,7 @@
 ```
 while (i < 10) {i++;};
 ```
+<img width="1282" height="990" alt="image" src="https://github.com/user-attachments/assets/768bcbcd-d77a-4ad4-908e-ab8906decddc" />
 
 | Код | Тип                  | Лексема | Позиция   |
 |-----|----------------------|---------|-----------|
@@ -58,6 +59,8 @@ while (i < 10) {
     i++;
 };
 ```
+
+<img width="1279" height="994" alt="image" src="https://github.com/user-attachments/assets/c5327272-6b04-4bd4-b7c5-26025d25ca42" />
 
 | Код | Тип                  | Лексема | Позиция   |
 |-----|----------------------|---------|-----------|
@@ -87,6 +90,8 @@ while (i ? 10) {
     i++;
 };
 ```
+
+<img width="1278" height="983" alt="image" src="https://github.com/user-attachments/assets/1e9b67bd-ae7f-4efb-bad2-2fad478c8b87" />
 
 | Код | Тип                  | Лексема | Позиция   |
 |-----|----------------------|---------|-----------|
