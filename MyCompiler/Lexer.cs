@@ -47,6 +47,13 @@ namespace MyCompiler.LexicalAnalyzer
             _errors = new List<LexicalError>();
         }
 
+        private bool IsDelimiter(char c)
+        {
+            if (char.IsWhiteSpace(c)) return true;
+            char[] structural = { '(', ')', '{', '}', ';', ',', '+', '-', '<', '>', '=', '!', '&', '|' };
+            return Array.Exists(structural, s => s == c);
+        }
+
         public List<Token> Analyze(string input)
         {
             _input = input;
@@ -99,7 +106,7 @@ namespace MyCompiler.LexicalAnalyzer
                         startLine = _line;
                         startColumn = _column;
 
-                        if (char.IsLetter(currentChar))
+                        if (char.IsLetter(currentChar) || (!char.IsLetterOrDigit(currentChar) && !IsDelimiter(currentChar)))
                         {
                             state = State.InLetter;
                             buffer.Append(currentChar);
@@ -249,6 +256,12 @@ namespace MyCompiler.LexicalAnalyzer
                             _position++;
                             _column++;
                         }
+                        else if (!char.IsLetterOrDigit(currentChar) && !IsDelimiter(currentChar))
+                        {
+                            buffer.Append(currentChar);
+                            _position++;
+                            _column++;
+                        }
                         else
                         {
                             return CreateIdentifierToken(buffer.ToString(),
@@ -299,6 +312,13 @@ namespace MyCompiler.LexicalAnalyzer
                         }
 
                     case State.InLess:
+                         if (!char.IsLetterOrDigit(currentChar) && !IsDelimiter(currentChar))
+                        {
+                            buffer.Append(currentChar);
+
+                            _position++;
+                            _column++;
+                        }
                         if (currentChar == '=')
                         {
                             _position++;
@@ -306,10 +326,20 @@ namespace MyCompiler.LexicalAnalyzer
                             return new Token(TokenType.OperatorLessEqual, "<=",
                                 startLine, startColumn, _column - 1);
                         }
+                        
                         else
                         {
-                            return new Token(TokenType.OperatorLess, "<",
+                            if (buffer.Length != 1)
+                            {
+                                return CreateIdentifierToken(buffer.ToString(),
+                               startLine, startColumn, _column - 1);
+                            }
+                            else
+                            {
+                                return new Token(TokenType.OperatorLess, "<",
                                 startLine, startColumn, _column - 1);
+                            }
+                            
                         }
 
                     case State.InGreater:
@@ -451,7 +481,6 @@ namespace MyCompiler.LexicalAnalyzer
         public List<Token> Tokens => _tokens;
         public List<LexicalError> Errors => _errors;
         public bool HasErrors => _errors.Count > 0;
-
 
     }
 }
