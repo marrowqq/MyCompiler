@@ -243,7 +243,7 @@ namespace MyCompiler.LexicalAnalyzer
                         break;
 
                     case State.InLetter:
-                        if (char.IsLetterOrDigit(currentChar))
+                        if (char.IsLetterOrDigit(currentChar) )
                         {
                             buffer.Append(currentChar);
                             _position++;
@@ -451,5 +451,7 @@ namespace MyCompiler.LexicalAnalyzer
         public List<Token> Tokens => _tokens;
         public List<LexicalError> Errors => _errors;
         public bool HasErrors => _errors.Count > 0;
+
+
     }
 }

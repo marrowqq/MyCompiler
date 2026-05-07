@@ -1,141 +1,157 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using MyCompiler.LexicalAnalyzer;
 
 namespace MyCompiler.SyntaxAnalyzer
 {
     public class Parser
     {
-        private readonly List<Token> _tokens;
-        private int _currentPos;
-        private Token _currentToken;
-        public List<SyntaxError> Errors { get; }
+        private List<Token> tokens;
+        private List<Token> _tokens;
+        private int currentPos;
+        private List<SyntaxError> errors;
+        private Token currentToken;
 
         public Parser(List<Token> tokens)
         {
-            _tokens = tokens?.Where(t => !IsIgnorable(t)).ToList() ?? new List<Token>();
-            _currentPos = 0;
-            Errors = new List<SyntaxError>();
-            UpdateCurrentToken();
+            this.tokens = tokens ?? new List<Token>();
+            currentPos = 0;
+            errors = new List<SyntaxError>();
+            SetCurrentToken();
+            
         }
 
-        private bool IsIgnorable(Token t) =>
-            t.Type == TokenType.OperatorSpace ||
-            t.Type == TokenType.OperatorNewLine ||
-            t.Type == TokenType.OperatorTab;
+        private void SetCurrentToken()
 
-        private void UpdateCurrentToken()
         {
-            _currentToken = _currentPos < _tokens.Count ? _tokens[_currentPos] : null;
+
+            while (currentPos < tokens.Count)
+
+            {
+
+                var t = tokens[currentPos];
+
+
+
+                if (IsWhitespaceOrNewLine(t))
+
+                {
+
+                    currentPos++;
+
+                    continue;
+
+                }
+
+
+
+                if (t.Type == TokenType.Error)
+
+                {
+
+                    AddError($"Недопустимый символ в коде: '{t.Value}'", t.Value, "валидная лексема");
+
+                    currentPos++;
+
+                    continue;
+
+                }
+
+
+
+                break;
+
+            }
+
+            currentToken = currentPos < tokens.Count ? tokens[currentPos] : null;
+
         }
+
+        private bool IsWhitespaceOrNewLine(Token token) =>
+            token != null && (token.Type == TokenType.OperatorSpace ||
+                              token.Type == TokenType.OperatorNewLine ||
+                              token.Type == TokenType.OperatorTab);
 
         private void NextToken()
         {
-            if (_currentPos < _tokens.Count) _currentPos++;
-            UpdateCurrentToken();
+            if (currentPos < tokens.Count) currentPos++;
+            SetCurrentToken();
         }
 
-        private bool Check(TokenType type) => _currentToken != null && _currentToken.Type == type;
-
-        private void Consume(TokenType type, string message)
+        private void AddError(string message, string found, string expected)
         {
-            if (Check(type))
+            errors.Add(new SyntaxError
             {
-                NextToken();
-                return;
-            }
-
-            AddError(message, type.ToString());
-
-            // Если токен не тот, что ждали, мы его "съедаем", только если это не важный разделитель.
-            // Это позволяет парсеру перейти к следующему шагу и не выдавать 10 ошибок на одну опечатку.
-            if (_currentToken != null && !IsSyncToken(_currentToken.Type) && _currentToken.Type != TokenType.EndOfFile)
-            {
-                NextToken();
-            }
-        }
-
-        private bool IsSyncToken(TokenType type)
-        {
-            return type == TokenType.DelimiterRParen ||
-                   type == TokenType.DelimiterLBrace ||
-                   type == TokenType.DelimiterRBrace ||
-                   type == TokenType.DelimiterSemicolon;
-        }
-
-        private void AddError(string message, string expected)
-        {
-            Errors.Add(new SyntaxError
-            {
-                ErrorNumber = Errors.Count + 1,
+                ErrorNumber = errors.Count + 1,
                 Message = message,
                 Expected = expected,
-                Found = _currentToken?.Value ?? "EOF",
-                Line = _currentToken?.Line ?? 0,
-                Column = _currentToken?.StartColumn ?? 0
+                Found = found,
+                Line = currentToken?.Line ?? (tokens.Count > 0 ? tokens[^1].Line : 1),
+                Column = currentToken?.StartColumn ?? (tokens.Count > 0 ? tokens[^1].StartColumn : 1)
             });
-        }
-
-        private void Synchronize(params TokenType[] syncTokens)
-        {
-            var set = new HashSet<TokenType>(syncTokens);
-            while (_currentToken != null && !set.Contains(_currentToken.Type) && _currentToken.Type != TokenType.EndOfFile)
-            {
-                NextToken();
-            }
         }
 
         public List<SyntaxError> Parse()
         {
-            // 1. Поиск ключевого слова while
-            if (Check(TokenType.KeywordWhile))
+            if (currentToken == null) return errors;
+
+            if (CheckToken(TokenType.KeywordWhile))
             {
                 NextToken();
             }
             else
             {
-                AddError("Цикл должен начинаться с 'while'", "while");
-                Synchronize(TokenType.DelimiterLParen);
-            }
-
-            // --- ФИКС ДЛЯ "while;" ---
-            if (Check(TokenType.DelimiterSemicolon))
-            {
-                AddError("Лишняя ';' после while. Условие должно идти сразу в скобках.", "(");
-                NextToken();
-            }
-
-            // 2. Парсинг условия в скобках
-            Consume(TokenType.DelimiterLParen, "Ожидалась '(' после 'while'");
-            ParseCondition();
-            Consume(TokenType.DelimiterRParen, "Ожидалась ')' после условия");
-
-            // 3. СТРОГИЙ ПАРСИНГ ТЕЛА (только в {})
-            Consume(TokenType.DelimiterLBrace, "Ожидалась '{' перед телом цикла");
-
-            // Внутри блока может быть пусто, или могут быть инструкции. 
-            // ParseStatementBlock() сам будет крутиться, пока не встретит '}'
-            ParseStatementBlock();
-
-            Consume(TokenType.DelimiterRBrace, "Ожидалась '}' в конце блока");
-
-            // 4. СТРОГАЯ ТОЧКА С ЗАПЯТОЙ В КОНЦЕ
-            Consume(TokenType.DelimiterSemicolon, "Ожидалась ';' в конце конструкции цикла");
-
-            // 5. ПРОВЕРКА НА МУСОР (Конец файла)
-            if (_currentToken != null && _currentToken.Type != TokenType.EndOfFile)
-            {
-                AddError($"Неожиданный символ после завершения цикла: '{_currentToken.Value}'", "Конец файла");
-
-                // Пропускаем мусор
-                while (_currentToken != null && _currentToken.Type != TokenType.EndOfFile)
+                if (currentPos == 0)
                 {
-                    NextToken();
+                    AddError("Ожидалось 'while' в начале программы", currentToken.Value, "while");
+                    if (!CheckToken(TokenType.DelimiterLParen)) NextToken();
+                }
+                
+            }
+
+            if (!CheckToken(TokenType.DelimiterLParen))
+            {
+                bool foundLParen = false;
+                for (int i = currentPos; i < Math.Min(currentPos + 10, tokens.Count); i++)
+                {
+                    if (tokens[i].Type == TokenType.DelimiterLParen) { foundLParen = true; break; }
+                }
+
+                if (foundLParen)
+                {
+                    while (currentToken != null && !CheckToken(TokenType.DelimiterLParen)) NextToken();
+                }
+                else
+                {
+                    AddError("Пропущена открывающая скобка '('", currentToken?.Value, "(");
                 }
             }
 
-            return Errors;
+            if (CheckToken(TokenType.DelimiterLParen))
+            {
+                NextToken();
+                ParseCondition();
+                Expect(TokenType.DelimiterRParen, ")");
+            }
+
+            bool hasLBrace = CheckToken(TokenType.DelimiterLBrace);
+            if (hasLBrace) NextToken();
+            else AddError("Пропущена открывающая скобка '{'", currentToken?.Value, "{");
+
+            ParseStatementList();
+
+            if (hasLBrace) Expect(TokenType.DelimiterRBrace, "}");
+            else if (CheckToken(TokenType.DelimiterRBrace)) NextToken();
+
+            Expect(TokenType.DelimiterSemicolon, ";");
+
+            while (currentToken != null && currentToken.Type != TokenType.EndOfFile)
+            {
+                AddError("Лишняя лексема после программы", currentToken.Value, "конец файла");
+                NextToken();
+            }
+
+            return errors;
         }
 
         private void ParseCondition() => ParseLogicalOr();
@@ -143,7 +159,7 @@ namespace MyCompiler.SyntaxAnalyzer
         private void ParseLogicalOr()
         {
             ParseLogicalAnd();
-            while (Check(TokenType.OperatorLogicalOr))
+            while (CheckToken(TokenType.OperatorLogicalOr))
             {
                 NextToken();
                 ParseLogicalAnd();
@@ -153,7 +169,7 @@ namespace MyCompiler.SyntaxAnalyzer
         private void ParseLogicalAnd()
         {
             ParseComparison();
-            while (Check(TokenType.OperatorLogicalAnd))
+            while (CheckToken(TokenType.OperatorLogicalAnd))
             {
                 NextToken();
                 ParseComparison();
@@ -162,88 +178,85 @@ namespace MyCompiler.SyntaxAnalyzer
 
         private void ParseComparison()
         {
-            ParsePrimary();
-            if (IsComparisonOperator(_currentToken))
+            if (CheckToken(TokenType.DelimiterLParen))
             {
                 NextToken();
+                ParseCondition();
+                Expect(TokenType.DelimiterRParen, ")");
+            }
+            else
+            {
                 ParsePrimary();
-            }
-            // Если видим ID или число сразу после другого операнда — забыт знак сравнения
-            else if (_currentToken != null && (_currentToken.Type == TokenType.Identifier || _currentToken.Type == TokenType.IntegerNumber))
-            {
-                AddError("Ожидался оператор сравнения (==, !=, <, >, <=, >=)", "Comparison Operator");
-                NextToken(); // Пропускаем лишний операнд, чтобы не ломать скобки
-            }
-        }
-
-        private void ParseStatementBlock()
-        {
-            while (_currentToken != null && !Check(TokenType.DelimiterRBrace) && !Check(TokenType.EndOfFile))
-            {
-                ParseStatement();
+                if (IsComparisonOp(currentToken?.Type) && (currentToken.Value == "<=" ||currentToken.Value == "<" 
+                    || currentToken.Value == "==" || currentToken.Value == ">=" || currentToken.Value == ">"
+                    || currentToken.Value == "!="))
+                {
+                    NextToken();
+                    ParsePrimary();
+                }
+                else
+                {
+                    AddError("Ожидался оператор сравнения", currentToken?.Value, "< <= > >= != ==");
+                    NextToken();
+                    ParsePrimary();
+                }
             }
         }
 
         private void ParsePrimary()
         {
-            if (Check(TokenType.DelimiterLParen))
-            {
-                NextToken(); // Потребляем '('
-                ParseCondition(); // Рекурсивный запуск парсинга условий
-                Consume(TokenType.DelimiterRParen, "Ожидалась закрывающая ')'");
-            }
-            else if (Check(TokenType.Identifier) || Check(TokenType.IntegerNumber))
-            {
+            if (CheckToken(TokenType.Identifier) || CheckToken(TokenType.IntegerNumber))
                 NextToken();
-            }
             else
+                AddError("Ожидалось число или переменная", currentToken?.Value, "ID/NUM");
+        }
+
+        private void ParseStatementList()
+        {
+            while (currentToken != null &&
+                   !CheckToken(TokenType.DelimiterRBrace) &&
+                   !CheckToken(TokenType.DelimiterSemicolon) &&
+                   !CheckToken(TokenType.EndOfFile))
             {
-                AddError("Ожидалось имя переменной, число или '('", "Выражение");
-                // Синхронизация: не даем парсеру зависнуть на мусорном токене
-                if (_currentToken != null && !IsSyncToken(_currentToken.Type))
-                {
-                    NextToken();
-                }
+                ParseStatement();
             }
         }
 
         private void ParseStatement()
         {
-            if (Check(TokenType.Identifier))
+            if (CheckToken(TokenType.Identifier))
             {
-                NextToken(); // Потребляем имя переменной (например, 'i')
-
-                if (Check(TokenType.OperatorIncrement) || Check(TokenType.OperatorDecrement))
+                string id = currentToken.Value;
+                NextToken();
+                if (CheckToken(TokenType.OperatorIncrement) || CheckToken(TokenType.OperatorDecrement))
                 {
-                    NextToken(); // Потребляем '++' или '--'
+                    NextToken();
                 }
                 else
                 {
-                    AddError("После переменной ожидался инкремент или декремент", "++ / --");
-                    // Если там что-то другое (например, '+'), скипаем это до точки с запятой
-                    if (!Check(TokenType.DelimiterSemicolon)) NextToken();
+                    AddError($"Некорректная операция для '{id}'", currentToken?.Value, "++ или --");
+                    while (currentToken != null && !CheckToken(TokenType.DelimiterSemicolon) && !CheckToken(TokenType.DelimiterRBrace)) NextToken();
                 }
-
-                Consume(TokenType.DelimiterSemicolon, "Инструкция должна заканчиваться ';'");
+                Expect(TokenType.DelimiterSemicolon, ";");
             }
-            else if (!Check(TokenType.DelimiterRBrace)) // Если это не конец блока, значит инструкция просто битая
+            else
             {
-                AddError("Некорректная инструкция. Ожидалось выражение типа 'i++;'", "Statement");
-                Synchronize(TokenType.DelimiterSemicolon, TokenType.DelimiterRBrace);
-                if (Check(TokenType.DelimiterSemicolon)) NextToken();
+                AddError("Неизвестный оператор", currentToken?.Value, "инкремент (i++)");
+                NextToken(); 
             }
         }
 
-        private bool IsComparisonOperator(Token t)
+        private bool CheckToken(TokenType type) => currentToken != null && currentToken.Type == type;
+
+        private void Expect(TokenType type, string literal)
         {
-            if (t == null) return false;
-            return t.Type == TokenType.OperatorLess ||
-                   t.Type == TokenType.OperatorGreater ||
-                   t.Type == TokenType.OperatorLessEqual ||
-                   t.Type == TokenType.OperatorGreaterEqual ||
-                   t.Type == TokenType.OperatorEqual ||
-                   t.Type == TokenType.OperatorNotEqual;
+            if (CheckToken(type)) NextToken();
+            else AddError($"Ожидалось '{literal}'", currentToken?.Value ?? "EOF", literal);
         }
 
+        private bool IsComparisonOp(TokenType? type) =>
+            type == TokenType.OperatorLess || type == TokenType.OperatorGreater ||
+            type == TokenType.OperatorEqual || type == TokenType.OperatorNotEqual ||
+            type == TokenType.OperatorLessEqual || type == TokenType.OperatorGreaterEqual;
     }
 }
