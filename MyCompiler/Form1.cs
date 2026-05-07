@@ -922,31 +922,31 @@ public partial class Form1 : Form
             DataGridViewTextBoxColumn colNumber = new DataGridViewTextBoxColumn();
             colNumber.Name = "ErrorNumber";
             colNumber.HeaderText = "№";
-            colNumber.Width = 40;
+            colNumber.FillWeight = 40;
             dgvSyntaxErrors.Columns.Add(colNumber);
 
             DataGridViewTextBoxColumn colMessage = new DataGridViewTextBoxColumn();
             colMessage.Name = "ErrorMessage";
             colMessage.HeaderText = "Сообщение об ошибке";
-            colMessage.Width = 300;
+            colMessage.FillWeight = 300;
             dgvSyntaxErrors.Columns.Add(colMessage);
 
             DataGridViewTextBoxColumn colExpected = new DataGridViewTextBoxColumn();
             colExpected.Name = "Expected";
             colExpected.HeaderText = "Ожидалось";
-            colExpected.Width = 100;
+            colExpected.FillWeight = 100;
             dgvSyntaxErrors.Columns.Add(colExpected);
 
             DataGridViewTextBoxColumn colFound = new DataGridViewTextBoxColumn();
             colFound.Name = "Found";
             colFound.HeaderText = "Найдено";
-            colFound.Width = 100;
+            colFound.FillWeight = 100;
             dgvSyntaxErrors.Columns.Add(colFound);
 
             DataGridViewTextBoxColumn colPosition = new DataGridViewTextBoxColumn();
             colPosition.Name = "ErrorPosition";
             colPosition.HeaderText = "Позиция";
-            colPosition.Width = 80;
+            colPosition.FillWeight = 80;
             dgvSyntaxErrors.Columns.Add(colPosition);
         }
 
