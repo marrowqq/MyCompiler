@@ -32,18 +32,23 @@
 ```
 while (i < 10) {i++;};
 ```
+<img width="888" height="591" alt="image" src="https://github.com/user-attachments/assets/0c60eb2a-c348-43d2-ae78-97e94527819a" />
 **Корректный пример многострочный:**
 ```
 while (i < 10) {
     i++;
 };
 ```
+<img width="886" height="594" alt="image" src="https://github.com/user-attachments/assets/b9204263-993c-4d7b-8add-fc9f2fe60590" />
+
 **Некорректный пример:**
 ```
-while (i ? 10) {
-    i++;
+whыфвпаile (i ? 10) {
+	i++;
 };
 ```
+<img width="887" height="595" alt="image" src="https://github.com/user-attachments/assets/85801686-836e-4b3e-a63d-c3752b1fe09d" />
+
 
 **Разработка грамматики:**
 ```
@@ -65,10 +70,11 @@ T = {while, (, ), {, }, ;, &&, ||, <, >, <=, >=, ==, !=, ++, --, <variable>, <nu
 N = {<start>, <condition>, <logical_operator>, <LOGSTMNT>, <comparison_operator>, <number>, <digit>, <statement_block>, <statement_list>, <statement>, <increment_statement>}
 
 **Классификация грамматики (по Хомскому):**
-Данная грамматика относится к контекстно-свободному типу (КС-грамматика, тип 2) по классификации Хомского.
+Данная грамматика относится к контекстно-свободному типу по классификации Хомского.
+"Язык является контекстно-свободным, если он определяется (задается или распознается) автоматом с магазинной (стековой) памятью."
 
 Метод анализа - рекурсивный спуск.
-![alt text](FOR3.PNG)
+<img width="161" height="578" alt="image" src="https://github.com/user-attachments/assets/4688acac-00aa-4709-8fcf-17e7a4f29a89" />
 
 **Диагностика и нейтрализация синтаксических ошибок:**
 
