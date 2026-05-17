@@ -33,6 +33,7 @@
 while (i < 10) {i++;};
 ```
 <img width="888" height="591" alt="image" src="https://github.com/user-attachments/assets/0c60eb2a-c348-43d2-ae78-97e94527819a" />
+
 **Корректный пример многострочный:**
 ```
 while (i < 10) {
