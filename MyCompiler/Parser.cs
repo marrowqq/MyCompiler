@@ -1,6 +1,7 @@
-﻿using System;
+﻿using MyCompiler.LexicalAnalyzer;
+using System;
 using System.Collections.Generic;
-using MyCompiler.LexicalAnalyzer;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MyCompiler.SyntaxAnalyzer
 {
@@ -17,8 +18,51 @@ namespace MyCompiler.SyntaxAnalyzer
             this.tokens = tokens ?? new List<Token>();
             currentPos = 0;
             errors = new List<SyntaxError>();
+            combinetokens();
             SetCurrentToken();
             
+        }
+        private void combinetokens()
+        {
+            if (this.tokens == null || this.tokens.Count == 0) return;
+
+            List<Token> combined = new List<Token>();
+            int i = 0;
+
+            while (i < this.tokens.Count)
+            {
+                Token current = this.tokens[i];
+
+                Token combinedToken = new Token(
+                    current.Type,
+                    current.Value,
+                    current.Line,
+                    current.StartColumn,
+                    current.EndColumn
+                );
+
+                int j = 1;
+                while (i + j < this.tokens.Count && this.tokens[i + j].Type == combinedToken.Type)
+                {
+                    if (current.Type == TokenType.Error && this.tokens[i + j].Type == TokenType.Error)
+                    {
+                        string nextVal = this.tokens[i + j].Value;
+
+
+                        combinedToken.Value += nextVal;
+                        combinedToken.EndColumn = this.tokens[i + j].EndColumn;
+                        j++;
+                    }
+
+                    
+
+                }
+
+                combined.Add(combinedToken);
+                i += j;
+            }
+
+            this.tokens = combined;
         }
 
         private void SetCurrentToken()

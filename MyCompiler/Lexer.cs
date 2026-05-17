@@ -256,7 +256,7 @@ namespace MyCompiler.LexicalAnalyzer
                             _position++;
                             _column++;
                         }
-                        else if (!char.IsLetterOrDigit(currentChar) && !IsDelimiter(currentChar))
+                        else if (!char.IsLetterOrDigit(currentChar) && (!IsDelimiter(currentChar) || currentChar == ';'))
                         {
                             buffer.Append(currentChar);
                             _position++;
@@ -372,6 +372,15 @@ namespace MyCompiler.LexicalAnalyzer
                         }
 
                     case State.InNot:
+
+                        if (char.IsLetter(currentChar))
+                        {
+                            _position++;
+                            _column++;
+                            return CreateIdentifierToken(currentChar.ToString(),
+                               startLine, startColumn, _column - 1);
+                        }
+
                         if (currentChar == '=')
                         {
                             _position++;
@@ -379,9 +388,10 @@ namespace MyCompiler.LexicalAnalyzer
                             return new Token(TokenType.OperatorNotEqual, "!=",
                                 startLine, startColumn, _column - 1);
                         }
-                        else
+
+                        else 
                         {
-                            Token err = CreateErrorToken($"Одиночный '!' недопустим, ожидалось '!='",
+                                Token err = CreateErrorToken($"Одиночный '!' недопустим, ожидалось '!='",
                                 startLine, startColumn);
                             return err;
                         }

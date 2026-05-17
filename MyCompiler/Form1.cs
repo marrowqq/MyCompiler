@@ -599,7 +599,7 @@ public partial class Form1 : Form
 
                 if (syntaxErrors.Count > 0)
                 {
-                    HighlightSyntaxErrors(syntaxErrors);
+                    //HighlightSyntaxErrors(syntaxErrors);
                 }
                 if (syntaxErrors.Count == 0 && !_lexer.HasErrors)
                 {
