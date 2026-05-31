@@ -215,170 +215,164 @@ dot -Tpng .square.dot -o cfg_square.png
 
 
 
-**Индивидуальное задание**
-Получение IR для -O0 и -O2
-IR без оптимизации, команда:
+**Построение IR для -O0**
 ```
-clang -S -emit-llvm -O0 -Xclang -disable-O0-optnone main.cpp -o main_O0.ll
+clang -O0 -S -emit-llvm while.c -o while_O0.ll
 ```
 Результат:
-<img width="1171" height="764" alt="image" src="https://github.com/user-attachments/assets/60d41116-a26a-4cf8-a41f-c1deb8c5acdb" />
+```
+; ModuleID = 'while.c'
+source_filename = "while.c"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-pc-linux-gnu"
 
-**Генерация LLVM IR**
-Команда:
-```
-clang -S -emit-llvm -O0 -Xclang -disable-O0-optnone main.cpp -o main_O0.ll
-```
-Результат(main_O0.ll):
-```
-; ModuleID = 'main.cpp'
-source_filename = "main.cpp"
-target datalayout = "e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
-target triple = "x86_64-pc-windows-msvc19.33.0"
-
-; Function Attrs: mustprogress noinline norecurse nounwind uwtable
-define dso_local noundef i32 @main() #0 {
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @main() #0 {
   %1 = alloca i32, align 4
   %2 = alloca i32, align 4
   %3 = alloca i32, align 4
-  store i32 0, ptr %1, align 4
-  store i32 0, ptr %2, align 4
-  store i32 0, ptr %3, align 4
+  store i32 0, i32* %1, align 4
+  store i32 0, i32* %2, align 4
+  store i32 0, i32* %3, align 4
   br label %4
 
 4:                                                ; preds = %7, %0
-  %5 = load i32, ptr %2, align 4
+  %5 = load i32, i32* %2, align 4
   %6 = icmp slt i32 %5, 10
   br i1 %6, label %7, label %13
 
 7:                                                ; preds = %4
-  %8 = load i32, ptr %2, align 4
-  %9 = load i32, ptr %3, align 4
+  %8 = load i32, i32* %2, align 4
+  %9 = load i32, i32* %3, align 4
   %10 = add nsw i32 %9, %8
-  store i32 %10, ptr %3, align 4
-  %11 = load i32, ptr %2, align 4
+  store i32 %10, i32* %3, align 4
+  %11 = load i32, i32* %2, align 4
   %12 = add nsw i32 %11, 1
-  store i32 %12, ptr %2, align 4
-  br label %4, !llvm.loop !8
+  store i32 %12, i32* %2, align 4
+  br label %4, !llvm.loop !6
 
 13:                                               ; preds = %4
-  %14 = load i32, ptr %3, align 4
+  %14 = load i32, i32* %3, align 4
   ret i32 %14
 }
 
-attributes #0 = { mustprogress noinline norecurse nounwind uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #0 = { noinline nounwind optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 
-!llvm.dbg.cu = !{!0}
-!llvm.module.flags = !{!2, !3, !4, !5, !6}
-!llvm.ident = !{!7}
+!llvm.module.flags = !{!0, !1, !2, !3, !4}
+!llvm.ident = !{!5}
 
-!0 = distinct !DICompileUnit(language: DW_LANG_C_plus_plus_14, file: !1, producer: "clang version 22.1.6 (https://github.com/llvm/llvm-project fc4aad7b5db3fff421df9a9637605b9ca5667881)", isOptimized: false, runtimeVersion: 0, emissionKind: NoDebug, splitDebugInlining: false, nameTableKind: None)
-!1 = !DIFile(filename: "main.cpp", directory: "C:\\Users\\user\\Desktop\\asdf")
-!2 = !{i32 2, !"Debug Info Version", i32 3}
-!3 = !{i32 1, !"wchar_size", i32 2}
-!4 = !{i32 8, !"PIC Level", i32 2}
-!5 = !{i32 7, !"uwtable", i32 2}
-!6 = !{i32 1, !"MaxTLSAlign", i32 65536}
-!7 = !{!"clang version 22.1.6 (https://github.com/llvm/llvm-project fc4aad7b5db3fff421df9a9637605b9ca5667881)"}
-!8 = distinct !{!8, !9}
-!9 = !{!"llvm.loop.mustprogress"}
-
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 7, !"PIC Level", i32 2}
+!2 = !{i32 7, !"PIE Level", i32 2}
+!3 = !{i32 7, !"uwtable", i32 1}
+!4 = !{i32 7, !"frame-pointer", i32 2}
+!5 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
+!6 = distinct !{!6, !7}
+!7 = !{!"llvm.loop.mustprogress"}
 ```
 
-Команда:
+Оптимизация индуктивных переменных (-indvars)
 ```
-clang -S -emit-llvm -O2 main.cpp -o main_O2.ll
+opt -indvars -S while_O0.ll -o while_indvars.ll
 ```
-Результат(main_O2.ll):
-```
-; ModuleID = 'main.cpp'
-source_filename = "main.cpp"
-target datalayout = "e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
-target triple = "x86_64-pc-windows-msvc19.33.0"
+Что делает: упрощает индуктивные переменные (здесь i), приводит к каноническому виду, иногда заменяет сложные выражения. Для данного цикла изменений может быть немного, но в общем случае улучшает анализ.
 
-; Function Attrs: mustprogress nofree norecurse nosync nounwind willreturn memory(none) uwtable
-define dso_local noundef i32 @main() local_unnamed_addr #0 {
-  ret i32 45
+Вынос инвариантов цикла (-licm)
+```
+opt -licm -S while_indvars.ll -o while_licm.ll
+```
+LICM (Loop Invariant Code Motion) – выносит из цикла выражения, которые не зависят от итераций. В нашем коде нет инвариантов, поэтому изменений не увидите. Для демонстрации добавьте int x = 5; и используйте x внутри цикла – тогда x будет вынесен.
+
+Развёртка цикла (-loop-unroll)
+```
+opt -loop-unroll -S while_licm.ll -o while_unroll.ll
+```
+При достаточном количестве итераций (10) и маленьком теле цикла, -loop-unroll может полностью развернуть цикл. В результате вместо блока с br появится последовательность операций add для sum и i. 
+
+Оптимизация индуктивных переменных
+```
+opt -indvars -S while_O0.ll -o while_indvars.ll
+```
+Что делает: упрощает индуктивные переменные (здесь i), приводит к каноническому виду, иногда заменяет сложные выражения. Для данного цикла изменений может быть немного, но в общем случае улучшает анализ.
+
+**Построение CFG**
+```
+opt -dot-cfg -disable-output while_O0.ll
+dot -Tpng .main.dot -o cfg_while_O0.png
+```
+<img width="601" height="193" alt="image" src="https://github.com/user-attachments/assets/b7e8704c-25b2-4dd1-88a9-bba46ccaf849" />
+
+<img width="601" height="193" alt="image" src="https://github.com/user-attachments/assets/43cf00e3-2de2-411b-af1e-eaf839dac986" />
+
+Отличие while от do-while в LLVM IR
+Пример:
+```
+int main() {
+    int i = 0, sum = 0;
+    do {
+        sum += i;
+        i++;
+    } while (i < 10);
+    return sum;
+}
+```
+
+```
+clang -O0 -S -emit-llvm dowhile.c -o dowhile_O0.ll
+```
+
+Результат:
+```
+; ModuleID = 'dowhile.c'
+source_filename = "dowhile.c"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-pc-linux-gnu"
+
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local i32 @main() #0 {
+  %1 = alloca i32, align 4
+  %2 = alloca i32, align 4
+  %3 = alloca i32, align 4
+  store i32 0, i32* %1, align 4
+  store i32 0, i32* %2, align 4
+  store i32 0, i32* %3, align 4
+  br label %4
+
+4:                                                ; preds = %10, %0
+  %5 = load i32, i32* %2, align 4
+  %6 = load i32, i32* %3, align 4
+  %7 = add nsw i32 %6, %5
+  store i32 %7, i32* %3, align 4
+  %8 = load i32, i32* %2, align 4
+  %9 = add nsw i32 %8, 1
+  store i32 %9, i32* %2, align 4
+  br label %10
+
+10:                                               ; preds = %4
+  %11 = load i32, i32* %2, align 4
+  %12 = icmp slt i32 %11, 10
+  br i1 %12, label %4, label %13, !llvm.loop !6
+
+13:                                               ; preds = %10
+  %14 = load i32, i32* %3, align 4
+  ret i32 %14
 }
 
-attributes #0 = { mustprogress nofree norecurse nosync nounwind willreturn memory(none) uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cmov,+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #0 = { noinline nounwind optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 
-!llvm.dbg.cu = !{!0}
-!llvm.module.flags = !{!2, !3, !4, !5, !6}
-!llvm.ident = !{!7}
+!llvm.module.flags = !{!0, !1, !2, !3, !4}
+!llvm.ident = !{!5}
 
-!0 = distinct !DICompileUnit(language: DW_LANG_C_plus_plus_14, file: !1, producer: "clang version 22.1.6 (https://github.com/llvm/llvm-project fc4aad7b5db3fff421df9a9637605b9ca5667881)", isOptimized: true, runtimeVersion: 0, emissionKind: NoDebug, splitDebugInlining: false, nameTableKind: None)
-!1 = !DIFile(filename: "main.cpp", directory: "C:\\Users\\user\\Desktop\\asdf")
-!2 = !{i32 2, !"Debug Info Version", i32 3}
-!3 = !{i32 1, !"wchar_size", i32 2}
-!4 = !{i32 8, !"PIC Level", i32 2}
-!5 = !{i32 7, !"uwtable", i32 2}
-!6 = !{i32 1, !"MaxTLSAlign", i32 65536}
-!7 = !{!"clang version 22.1.6 (https://github.com/llvm/llvm-project fc4aad7b5db3fff421df9a9637605b9ca5667881)"}
-
-```
-**Исследуйте, разворачивается ли цикл (-unroll)**
-Цикл был полностью развернут и удален (Full Unrolling). Поскольку количество итераций ($10$) и начальные значения счетчика известны на этапе компиляции, оптимизатор полностью избавился от базовых блоков проверки условия и переходов, провел полную свертку констант (вычислил сумму $0 + 1 + 2 + \dots + 9 = 45$) и заменил всё тело функции main единственной инструкцией ret i32 45.
-
-**Постройте CFG для main с -O0 и с -O2**
-Команда:
-```
+!0 = !{i32 1, !"wchar_size", i32 4}
+!1 = !{i32 7, !"PIC Level", i32 2}
+!2 = !{i32 7, !"PIE Level", i32 2}
+!3 = !{i32 7, !"uwtable", i32 1}
+!4 = !{i32 7, !"frame-pointer", i32 2}
+!5 = !{!"Ubuntu clang version 14.0.0-1ubuntu1.1"}
+!6 = distinct !{!6, !7}
+!7 = !{!"llvm.loop.mustprogress"}
 
 ```
-Результат (-O0):
-
-Результат (-O2):
-
-Примените дополнительно -loop-rotate, -licm и опишите изменения.
-Команда:
-```
-
-```
-Результат (main_opt.ll):
-```
-
-```
-
-Результат (cfg_opt.png):
-
-
-Результат трансформации структуры цикла:
-При применении прохода -loop-rotate компилятор преобразует цикл while в структуру do-while. Перед циклом создается специальный базовый блок-заголовок (Guard/Preheader), где условие проверяется один раз перед входом. Если проверка успешна, управление передается в тело цикла.
-Изменения в CFG:
-Внутри самого тела цикла проверка переносится в самый конец (в хвост блока body). Это позволяет убрать один лишний безусловный переход br на каждой итерации, так как условный переход сразу осуществляет возврат на новую итерацию, что снижает нагрузку на конвейер процессора и оптимизирует переходы.
-Вывод - какие оптимизации применились к циклу?
-- К переменным и памяти (-mem2reg): Все локальные переменные i и sum были подняты из медленной стековой памяти (alloca, load, store) в быстрые виртуальные SSA-регистры с использованием $\phi$-узлов.
-- К циклу (-loop-unroll / -indvars): Переменная i была распознана как каноническая индукционная переменная. Благодаря фиксированным границам цикла ($i < 10$), компилятор произвел полное развертывание (Full Unroll).
-- К вычислениям (Constant Folding): После развертывания цепочка сложений была вычислена компилятором превентивно, что свело всю функцию к возврату готового ответа 45.
-
-**Дополнительное задание**
-Выбранная синтаксическая конструкция
-В качестве целевой конструкции используется Цикл while с предопределенным счетчиком и операциями инкремента:
-```
-while (i < 10) { i++; };
-```
-Построение абстрактного синтаксического дерева (AST)
-Синтаксический анализ и построение AST были реализованы в рамках Лабораторной работы №5. Для целевой конструкции парсер формирует узел WhileNode, содержащий дочерний узел условия BinaryOpNode (со знаками <, >) и список выражений внутри тела цикла Body (UpdateNode для i++). Структура дерева визуализируется в графическом интерфейсе программы.
-
-Генерация промежуточного представления (IR)
-Исходное AST транслируется в трехадресный код виртуальных инструкций.
-Набор используемых инструкций:
-ALLOC_VAR — выделение памяти под переменную счетчика на виртуальном стеке.
-COMPARE — вычисление логического выражения (условия выхода из цикла).
-JUMP_IF_FALSE — условный переход по результату сравнения на блок выхода.
-INCREMENT — атомарное изменение значения переменной на единицу.
-
-Локальные оптимизации
-
-Оптимизация 1: Свертка констант в условиях (Constant Folding)
-Описание: Если в условии цикла используются две заведомо известные константы (например, while (5 < 2)), данный проход вычисляет результат выражения на этапе компиляции.
-Сохранение семантики: Логическое выражение заменяется на константное значение false, превращая весь цикл в «мертвый код».
-
-Оптимизация 2: Удаление недостижимого кода (Dead Code Elimination)
-Описание: Если оптимизация условий (Оптимизация 1) определила, что условие цикла всегда ложно при первом входе, весь базовый блок тела цикла WhileLoop признается недостижимым и полностью вырезается из итогового списка инструкций IR.
-Сохранение семантики: Код, который никогда не выполнится, удаляется, уменьшая размер результирующего файла без изменения логики работы программы.
-
-Скриншоты работы программы
 
 **Ответы на контрольные вопросы**
 Что такое Clang, и какова его роль в процессе компиляции программ?
