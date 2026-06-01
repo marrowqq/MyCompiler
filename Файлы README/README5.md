@@ -20,7 +20,7 @@
 
 **Структура абстрактного синтаксического дерева (AST)**
 
-<img width="1396" height="907" alt="image" src="https://github.com/user-attachments/assets/6a6e581b-166b-435a-9045-63d6cdc2ca71" />
+<img width="1357" height="889" alt="image" src="https://github.com/user-attachments/assets/c84dfe9a-5e4d-4c60-80bc-3b99e90671b3" />
 
 Семантический модуль оперирует следующими типами узлов:
 1. Root (Корневой уровень)
