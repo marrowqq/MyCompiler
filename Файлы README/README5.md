@@ -19,6 +19,7 @@
 ```
 
 **Структура абстрактного синтаксического дерева (AST)**
+
 <img width="408" height="393" alt="image" src="https://github.com/user-attachments/assets/490336e3-90a2-471a-a33e-38ec8ed58422" />
 
 1. ProgramNode (Корень)
